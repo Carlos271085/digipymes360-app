@@ -12,9 +12,11 @@ fun AppNavGraph(navController: NavHostController) {
         startDestination = "login"
     ) {
         composable("login") { LoginScreen(navController) }
+        composable("register") { RegisterScreen(navController) }
         composable("home") { HomeScreen(navController) }
         composable("movements") { MovementsScreen(navController) }
         composable("qr") { QrScreen(navController) }
         composable("send_money") { SendMoneyScreen(navController) }
     }
 }
+
