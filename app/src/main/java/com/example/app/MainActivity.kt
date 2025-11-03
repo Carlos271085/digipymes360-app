@@ -1,26 +1,30 @@
 package com.example.app
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import com.example.app.ui.screens.BiometricScreen
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
 import com.example.app.ui.theme.AppTheme
+import com.example.app.view.AppNavGraph
 
-import androidx.fragment.app.FragmentActivity
-
-
-
-class MainActivity : FragmentActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                Surface(color = MaterialTheme.colorScheme.background) {
-                    BiometricScreen(this) // 👈 Muestra la pantalla biométrica
+                val navController = rememberNavController()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    // Llamamos al grafo de navegación
+                    AppNavGraph(navController = navController)
                 }
             }
         }
     }
 }
-

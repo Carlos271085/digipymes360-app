@@ -1,168 +1,155 @@
 package com.example.app.view
 
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.app.viewmodel.AuthViewModel
+import com.example.app.R
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(
-    navController: NavController,
-    authViewModel: AuthViewModel? = null
-) {
-    val sharedAuthViewModel = authViewModel ?: viewModel()
+fun RegisterScreen(navController: NavController) {
+    val context = LocalContext.current
+
     var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    val loginError by sharedAuthViewModel.loginError.observeAsState()
-    val registrationSuccess by sharedAuthViewModel.registrationSuccess.observeAsState(false)
-
-    LaunchedEffect(registrationSuccess) {
-        if (registrationSuccess == true) {
-            navController.navigate(AppScreen.PokemonExplorer.route) {
-                popUpTo(AppScreen.Register.route) { inclusive = true }
-            }
-        }
-    }
+    // --- Snackbar setup ---
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Crear Cuenta") })
-        }
-    ) { innerPadding ->
+            TopAppBar(
+                title = { Text("Registro") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) } // ✅ Muestra snackbar
+    ) { pad ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(pad)
+                .padding(24.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Registrarse",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 32.dp)
+
+            // --- LOGO ---
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo Pymes 360",
+                modifier = Modifier
+                    .size(150.dp)
+                    .padding(bottom = 16.dp)
             )
 
+            Text(
+                text = "Crea tu cuenta PYMES 360",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            // --- CAMPOS DEL FORMULARIO ---
             OutlinedTextField(
                 value = name,
-                onValueChange = {
-                    name = it
-                    sharedAuthViewModel.clearError()
-                },
-                label = { Text("Nombre") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                singleLine = true
+                onValueChange = { name = it },
+                label = { Text("Nombre completo") },
+                modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Correo electrónico") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = password,
-                onValueChange = {
-                    password = it
-                    sharedAuthViewModel.clearError()
-                },
+                onValueChange = { password = it },
                 label = { Text("Contraseña") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-                        )
-                    }
-                },
-                singleLine = true
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
             )
 
-            OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = {
-                    confirmPassword = it
-                    sharedAuthViewModel.clearError()
-                },
-                label = { Text("Confirmar Contraseña") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                        Icon(
-                            imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (confirmPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-                        )
-                    }
-                },
-                singleLine = true
-            )
+            Spacer(Modifier.height(24.dp))
 
-            loginError?.let { error ->
-                Text(
-                    text = error,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
-
-            if (password != confirmPassword && confirmPassword.isNotEmpty()) {
-                Text(
-                    text = "Las contraseñas no coinciden",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
-
+            // --- BOTÓN REGISTRO ---
             Button(
                 onClick = {
-                    if (password == confirmPassword) {
-                        sharedAuthViewModel.registerUser(name, password)
+                    if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
+                        saveUserData(context, email, password)
+                        // Mostrar SnackBar
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Registro exitoso 🎉",
+                                withDismissAction = true,
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                        // Navegar después de un pequeño delay
+                        scope.launch {
+                            kotlinx.coroutines.delay(2000)
+                            navController.navigate("login")
+                        }
+                    } else {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Completa todos los campos",
+                                withDismissAction = true
+                            )
+                        }
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                enabled = name.isNotBlank() && password.isNotBlank() && password == confirmPassword
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
+                Text("Registrarse", color = MaterialTheme.colorScheme.onPrimary)
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // --- BOTÓN VOLVER AL LOGIN ---
+            TextButton(onClick = { navController.navigate("login") }) {
                 Text(
-                    text = "Crear Cuenta",
-                    fontSize = 18.sp
+                    "¿Ya tienes cuenta? Inicia sesión aquí",
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun RegisterScreenPreview() {
-    RegisterScreen(navController = rememberNavController())
+// --- Guarda usuario en SharedPreferences ---
+fun saveUserData(context: Context, email: String, password: String) {
+    val sharedPref = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    with(sharedPref.edit()) {
+        putString("user_email", email)
+        putString("user_password", password)
+        apply()
+    }
 }
+
+
+

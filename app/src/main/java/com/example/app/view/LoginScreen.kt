@@ -1,153 +1,158 @@
 package com.example.app.view
 
+import android.content.Context
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.app.viewmodel.AuthViewModel
+import com.example.app.R // asegúrate de importar tu paquete correcto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
-    navController: NavController,
-    authViewModel: AuthViewModel? = null
-) {
-    val sharedAuthViewModel = authViewModel ?: viewModel()
-    var name by remember { mutableStateOf("") }
+fun LoginScreen(navController: NavController) {
+    val context = LocalContext.current
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
 
-    val loginError by sharedAuthViewModel.loginError.observeAsState()
-    val isAuthenticated by sharedAuthViewModel.isAuthenticated.observeAsState(false)
-
-    LaunchedEffect(isAuthenticated) {
-        if (isAuthenticated == true) {
-            navController.navigate(AppScreen.PokemonExplorer.route) {
-                popUpTo(AppScreen.Login.route) { inclusive = true }
-            }
-        }
-    }
+    val canUseBiometrics = remember { canAuthenticateWithBiometrics(context) }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Iniciar Sesión") })
+            TopAppBar(
+                title = { Text("Iniciar Sesión") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
         }
-    ) { innerPadding ->
+    ) { pad ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(pad)
+                .padding(24.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "¡Hola de nuevo!",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 32.dp)
+
+            // --- LOGO CENTRADO ---
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo Pymes 360",
+                modifier = Modifier
+                    .size(150.dp)
+                    .padding(bottom = 16.dp)
             )
 
-            OutlinedTextField(
-                value = name,
-                onValueChange = {
-                    name = it
-                    sharedAuthViewModel.clearError()
-                },
-                label = { Text("Nombre") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                singleLine = true
+            Text(
+                text = "Bienvenido a PYMES 360",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary
             )
+
+            Spacer(Modifier.height(24.dp))
+
+            // --- CAMPOS DE TEXTO ---
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Correo electrónico") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = password,
-                onValueChange = {
-                    password = it
-                    sharedAuthViewModel.clearError()
-                },
+                onValueChange = { password = it },
                 label = { Text("Contraseña") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-                        )
-                    }
-                },
-                singleLine = true
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
             )
 
-            loginError?.let { error ->
-                Text(
-                    text = error,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
+            Spacer(Modifier.height(16.dp))
 
+            // --- BOTÓN LOGIN ---
             Button(
                 onClick = {
-                    sharedAuthViewModel.loginWithCredentials(name, password)
+                    if (email == "" && password == "") {
+                        navController.navigate("home")
+                    }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                enabled = name.isNotBlank() && password.isNotBlank()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             ) {
+                Text("Ingresar", color = MaterialTheme.colorScheme.onPrimary)
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // --- BOTÓN REGISTRO ---
+            TextButton(onClick = { navController.navigate("register") }) {
                 Text(
-                    text = "Iniciar Sesión",
-                    fontSize = 18.sp
+                    "¿No tienes cuenta? Regístrate aquí",
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "¿No tienes cuenta? ",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                TextButton(
-                    onClick = {
-                        navController.navigate(AppScreen.Register.route)
-                        sharedAuthViewModel.clearError()
-                    }
+            // --- BOTÓN DE HUELLA ---
+            if (canUseBiometrics) {
+                OutlinedButton(
+                    onClick = { authenticateWithBiometrics(context) { navController.navigate("home") } },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary
+                    )
                 ) {
-                    Text("Regístrate")
+                    Text("Iniciar con huella dactilar")
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen(navController = rememberNavController())
+// --- Funciones biométricas ---
+
+fun canAuthenticateWithBiometrics(context: Context): Boolean {
+    val biometricManager = BiometricManager.from(context)
+    return biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) ==
+            BiometricManager.BIOMETRIC_SUCCESS
 }
+
+fun authenticateWithBiometrics(context: Context, onSuccess: () -> Unit) {
+    val executor = ContextCompat.getMainExecutor(context)
+    val biometricPrompt = BiometricPrompt(
+        context as androidx.fragment.app.FragmentActivity,
+        executor,
+        object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                onSuccess()
+            }
+        }
+    )
+
+    val promptInfo = BiometricPrompt.PromptInfo.Builder()
+        .setTitle("Autenticación biométrica")
+        .setSubtitle("Usa tu huella para iniciar sesión")
+        .setNegativeButtonText("Cancelar")
+        .build()
+
+    biometricPrompt.authenticate(promptInfo)
+}
+

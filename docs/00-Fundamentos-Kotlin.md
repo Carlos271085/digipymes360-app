@@ -82,6 +82,7 @@ val nombre: String = "Juan"
 val edad: Int = 25
 val precio: Double = 19.99
 val activo: Boolean = true
+
 ```
 
 ### Tipos comunes
@@ -300,6 +301,7 @@ val (nombre, email, edad) = user
 println(nombre) // "Juan"
 println(email) // "juan@email.com"
 println(edad) // 25
+
 
 // Ignorar valores que no necesitas
 val (nombre, _, edad) = user // Ignora email

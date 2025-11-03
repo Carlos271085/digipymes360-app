@@ -1,83 +1,74 @@
 package com.example.app.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun homeScreen(navController: NavController? = null) {
+fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Mi Aplicación en Kotlin") })
+            TopAppBar(
+                title = { Text("Inicio") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Volver"
+                        )
+                    }
+                }
+            )
         }
-    ) { innerPadding ->
+    ) { pad ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp),
+                .padding(pad)
+                .padding(16.dp)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "¡Bienvenid@!",
-                fontWeight = FontWeight.Bold
+                text = "Bienvenido a tu billetera digital",
+                style = MaterialTheme.typography.headlineSmall
             )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = { navController.navigate("movements") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Ver Movimientos")
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = {
-                    navController?.navigate(AppScreen.Profile.route)
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red,
-                    contentColor = Color.White
-                )
-            ) {
-                Text("Ver Perfil")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedButton(
-                onClick = {
-                    navController?.navigate(AppScreen.PokemonExplorer.route)
-                },
+                onClick = { navController.navigate("qr") },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Pokédex")
+                Text("Cobrar con QR")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo App",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp),
-                contentScale = ContentScale.Fit
-            )
+            Button(
+                onClick = { navController.navigate("send_money") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Enviar Dinero")
+            }
         }
     }
 }
 
-@Preview (showBackground = true)
-@Composable
-fun homeScreenPreview(){
-    homeScreen()
-}
+
