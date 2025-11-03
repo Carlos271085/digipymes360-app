@@ -86,7 +86,7 @@ fun LoginScreen(navController: NavController) {
             // --- BOTÓN LOGIN ---
             Button(
                 onClick = {
-                    if (email == "demo@mail.com" && password == "1234") {
+                    if (email == "" && password == "") {
                         navController.navigate("home")
                     }
                 },

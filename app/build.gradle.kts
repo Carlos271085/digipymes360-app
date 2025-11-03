@@ -73,6 +73,8 @@ dependencies {
         // Íconos extendidos de Material (necesario para Fingerprint)
         implementation("androidx.compose.material:material-icons-extended:1.7.5")
 
+        //IMPORTAR MATERIAL DESIGN
+        implementation("androidx.compose.material3:material3")
     }
 
 

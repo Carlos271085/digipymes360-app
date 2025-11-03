@@ -1,30 +1,72 @@
 package com.example.app.view
 
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.app.R
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class) // ✅ para TextField y TopAppBar
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController) {
+    val context = LocalContext.current
+
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    // --- Snackbar setup ---
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Registrate") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Registro") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) } // ✅ Muestra snackbar
     ) { pad ->
         Column(
             modifier = Modifier
                 .padding(pad)
                 .padding(24.dp)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            // --- LOGO ---
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo Pymes 360",
+                modifier = Modifier
+                    .size(150.dp)
+                    .padding(bottom = 16.dp)
+            )
+
+            Text(
+                text = "Crea tu cuenta PYMES 360",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            // --- CAMPOS DEL FORMULARIO ---
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -51,17 +93,63 @@ fun RegisterScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
+            // --- BOTÓN REGISTRO ---
             Button(
                 onClick = {
-                    // Simulación de registro correcto
-                    navController.navigate("login")
+                    if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
+                        saveUserData(context, email, password)
+                        // Mostrar SnackBar
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Registro exitoso 🎉",
+                                withDismissAction = true,
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                        // Navegar después de un pequeño delay
+                        scope.launch {
+                            kotlinx.coroutines.delay(2000)
+                            navController.navigate("login")
+                        }
+                    } else {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Completa todos los campos",
+                                withDismissAction = true
+                            )
+                        }
+                    }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Registrarse")
+                Text("Registrarse", color = MaterialTheme.colorScheme.onPrimary)
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // --- BOTÓN VOLVER AL LOGIN ---
+            TextButton(onClick = { navController.navigate("login") }) {
+                Text(
+                    "¿Ya tienes cuenta? Inicia sesión aquí",
+                    color = MaterialTheme.colorScheme.secondary
+                )
             }
         }
     }
 }
+
+// --- Guarda usuario en SharedPreferences ---
+fun saveUserData(context: Context, email: String, password: String) {
+    val sharedPref = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    with(sharedPref.edit()) {
+        putString("user_email", email)
+        putString("user_password", password)
+        apply()
+    }
+}
+
+
+
