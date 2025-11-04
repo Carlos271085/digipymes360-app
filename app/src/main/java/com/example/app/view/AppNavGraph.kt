@@ -14,9 +14,9 @@ fun AppNavGraph(navController: NavHostController) {
         composable("login") { LoginScreen(navController) }
         composable("register") { RegisterScreen(navController) }
         composable("home") { HomeScreen(navController) }
-        composable("movements") { MovementsScreen(navController) }
+        //composable("movements") { MovementsScreen(navController) }
         composable("qr") { QrScreen(navController) }
-        composable("send_money") { SendMoneyScreen(navController) }
+        //composable("send_money") { SendMoneyScreen(navController) }
     }
 }
 
