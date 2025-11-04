@@ -16,15 +16,33 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.app.R // asegúrate de importar tu paquete correcto
+import com.example.app.ui.login.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController, viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val canUseBiometrics = remember { canAuthenticateWithBiometrics(context) }
+    //val canUseBiometrics = remember { canAuthenticateWithBiometrics(context) }
+
+    val loginResult by viewModel.loginResult.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    // Si el login fue exitoso
+    LaunchedEffect(loginResult) {
+        if (loginResult != null) {
+            navController.navigate("home")
+        }
+    }
+
+    // Si hubo error
+    LaunchedEffect(error) {
+        error?.let {
+            android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -45,8 +63,6 @@ fun LoginScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            // --- LOGO CENTRADO ---
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo Pymes 360",
@@ -56,14 +72,13 @@ fun LoginScreen(navController: NavController) {
             )
 
             Text(
-                text = "Bienvenido a PYMES 360",
+                text = "Bienvenido(a) a DIGIPYMES360",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primary
             )
 
             Spacer(Modifier.height(24.dp))
 
-            // --- CAMPOS DE TEXTO ---
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -83,11 +98,13 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(16.dp))
 
-            // --- BOTÓN LOGIN ---
             Button(
                 onClick = {
-                    if (email == "" && password == "") {
-                        navController.navigate("home")
+                    if (email.isNotEmpty() && password.isNotEmpty()) {
+                        // 🔹 Aquí llamamos a la API
+                        viewModel.login(email, password)
+                    } else {
+                        android.widget.Toast.makeText(context, "Ingresa email y contraseña", android.widget.Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -100,59 +117,12 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(12.dp))
 
-            // --- BOTÓN REGISTRO ---
             TextButton(onClick = { navController.navigate("register") }) {
-                Text(
-                    "¿No tienes cuenta? Regístrate aquí",
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                Text("¿No tienes cuenta? Regístrate aquí", color = MaterialTheme.colorScheme.secondary)
             }
 
             Spacer(Modifier.height(24.dp))
 
-            // --- BOTÓN DE HUELLA ---
-            if (canUseBiometrics) {
-                OutlinedButton(
-                    onClick = { authenticateWithBiometrics(context) { navController.navigate("home") } },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text("Iniciar con huella dactilar")
-                }
-            }
         }
     }
 }
-
-// --- Funciones biométricas ---
-
-fun canAuthenticateWithBiometrics(context: Context): Boolean {
-    val biometricManager = BiometricManager.from(context)
-    return biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) ==
-            BiometricManager.BIOMETRIC_SUCCESS
-}
-
-fun authenticateWithBiometrics(context: Context, onSuccess: () -> Unit) {
-    val executor = ContextCompat.getMainExecutor(context)
-    val biometricPrompt = BiometricPrompt(
-        context as androidx.fragment.app.FragmentActivity,
-        executor,
-        object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                onSuccess()
-            }
-        }
-    )
-
-    val promptInfo = BiometricPrompt.PromptInfo.Builder()
-        .setTitle("Autenticación biométrica")
-        .setSubtitle("Usa tu huella para iniciar sesión")
-        .setNegativeButtonText("Cancelar")
-        .build()
-
-    biometricPrompt.authenticate(promptInfo)
-}
-

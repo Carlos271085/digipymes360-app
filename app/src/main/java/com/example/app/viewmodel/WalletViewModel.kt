@@ -3,7 +3,6 @@ package com.example.app.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.app.data.remote.NetworkModule
-import com.example.app.data.repository.WalletRepository
 import com.example.app.model.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

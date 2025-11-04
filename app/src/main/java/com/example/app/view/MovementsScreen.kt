@@ -9,7 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.app.viewmodel.WalletViewModel
-
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovementsScreen(
@@ -50,3 +50,4 @@ fun MovementsScreen(
     }
 }
 
+*/
