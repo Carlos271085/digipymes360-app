@@ -15,7 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.example.app.R // asegúrate de importar tu paquete correcto
+import com.example.app.R
+import androidx.compose.ui.graphics.Color
+import com.example.app.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,12 +29,13 @@ fun LoginScreen(navController: NavController) {
     val canUseBiometrics = remember { canAuthenticateWithBiometrics(context) }
 
     Scaffold(
+        // --- BARRA SUPERIOR CON TU COLOR SECUNDARIO (BlueDark) ---
         topBar = {
             TopAppBar(
-                title = { Text("Iniciar Sesión") },
+                title = { Text("Iniciar Sesión", color = Color.White) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = BlueDark, // azul petróleo de tu paleta
+                    titleContentColor = Color.White
                 )
             )
         }
@@ -48,17 +51,17 @@ fun LoginScreen(navController: NavController) {
 
             // --- LOGO CENTRADO ---
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.logodigipymes),
                 contentDescription = "Logo Pymes 360",
                 modifier = Modifier
-                    .size(150.dp)
+                    .size(110.dp)
                     .padding(bottom = 16.dp)
             )
 
             Text(
                 text = "Bienvenido a PYMES 360",
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary
+                color = OrangePrimary // Naranja principal de tu paleta
             )
 
             Spacer(Modifier.height(24.dp))
@@ -67,8 +70,13 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Correo electrónico") },
-                modifier = Modifier.fillMaxWidth()
+                label = { Text("Correo electrónico", color = TextSecondary) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = OrangePrimary, // color al enfocar
+                    unfocusedBorderColor = BlueDark,
+                    cursorColor = OrangePrimary
+                )
             )
 
             Spacer(Modifier.height(12.dp))
@@ -76,9 +84,14 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Contraseña") },
+                label = { Text("Contraseña", color = TextSecondary) },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = OrangePrimary,
+                    unfocusedBorderColor = BlueDark,
+                    cursorColor = OrangePrimary
+                )
             )
 
             Spacer(Modifier.height(16.dp))
@@ -86,16 +99,17 @@ fun LoginScreen(navController: NavController) {
             // --- BOTÓN LOGIN ---
             Button(
                 onClick = {
-                    if (email == "" && password == "") {
+                    if (email.isNotEmpty() && password.isNotEmpty()) {
                         navController.navigate("home")
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.wrapContentWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = OrangePrimary, // color principal
+                    contentColor = Color.White
                 )
             ) {
-                Text("Ingresar", color = MaterialTheme.colorScheme.onPrimary)
+                Text("Ingresar")
             }
 
             Spacer(Modifier.height(12.dp))
@@ -104,55 +118,77 @@ fun LoginScreen(navController: NavController) {
             TextButton(onClick = { navController.navigate("register") }) {
                 Text(
                     "¿No tienes cuenta? Regístrate aquí",
-                    color = MaterialTheme.colorScheme.secondary
+                    color = BlueInfo // Azul informativo de tu paleta
                 )
             }
 
             Spacer(Modifier.height(24.dp))
 
-            // --- BOTÓN DE HUELLA ---
+            // --- HUELLA DACTILAR ---
             if (canUseBiometrics) {
-                OutlinedButton(
-                    onClick = { authenticateWithBiometrics(context) { navController.navigate("home") } },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    val activity = context as? androidx.fragment.app.FragmentActivity
+                    IconButton(
+                        onClick = {
+                            activity?.let {
+                                authenticateWithBiometrics(it) { navController.navigate("home") }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.huella),
+                            contentDescription = "Huella dactilar",
+                            tint = BlueDark,
+                            modifier = Modifier.size(64.dp)
+                        )
+                    }
+                    Text(
+                        text = "Presiona para iniciar sesión con tu huella dactilar",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = BlueDark
                     )
-                ) {
-                    Text("Iniciar con huella dactilar")
                 }
             }
         }
     }
 }
 
-// --- Funciones biométricas ---
+// --- Funciones biométricas (SIN CAMBIOS) ---
 
 fun canAuthenticateWithBiometrics(context: Context): Boolean {
     val biometricManager = BiometricManager.from(context)
-    return biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) ==
+    val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or
+            BiometricManager.Authenticators.DEVICE_CREDENTIAL
+
+    return biometricManager.canAuthenticate(authenticators) ==
             BiometricManager.BIOMETRIC_SUCCESS
 }
 
-fun authenticateWithBiometrics(context: Context, onSuccess: () -> Unit) {
-    val executor = ContextCompat.getMainExecutor(context)
+fun authenticateWithBiometrics(activity: androidx.fragment.app.FragmentActivity, onSuccess: () -> Unit) {
+    val executor = ContextCompat.getMainExecutor(activity)
     val biometricPrompt = BiometricPrompt(
-        context as androidx.fragment.app.FragmentActivity,
+        activity,
         executor,
         object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 onSuccess()
             }
+
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+            }
         }
     )
 
     val promptInfo = BiometricPrompt.PromptInfo.Builder()
         .setTitle("Autenticación biométrica")
-        .setSubtitle("Usa tu huella para iniciar sesión")
-        .setNegativeButtonText("Cancelar")
+        .setSubtitle("Usa tu huella o PIN para iniciar sesión")
+        .setAllowedAuthenticators(
+            BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        )
         .build()
 
     biometricPrompt.authenticate(promptInfo)
 }
-

@@ -13,6 +13,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.app.R
+import com.example.app.model.Usuario
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,9 +21,12 @@ import kotlinx.coroutines.launch
 fun RegisterScreen(navController: NavController) {
     val context = LocalContext.current
 
+    // --- Variables de estado ---
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var direccion by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
 
     // --- Snackbar setup ---
     val snackbarHostState = remember { SnackbarHostState() }
@@ -38,7 +42,7 @@ fun RegisterScreen(navController: NavController) {
                 )
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) } // ✅ Muestra snackbar
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { pad ->
         Column(
             modifier = Modifier
@@ -51,8 +55,8 @@ fun RegisterScreen(navController: NavController) {
 
             // --- LOGO ---
             Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo Pymes 360",
+                painter = painterResource(id = R.drawable.logodigipymes),
+                contentDescription = "Logo PYMES 360",
                 modifier = Modifier
                     .size(150.dp)
                     .padding(bottom = 16.dp)
@@ -93,22 +97,50 @@ fun RegisterScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(Modifier.height(12.dp))
+
+            // --DIRECCIÓN -- //
+            OutlinedTextField(
+                value = direccion,
+                onValueChange = { direccion = it },
+                label = { Text("Dirección completa (Calle, N°, Comuna y región)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            // --- TELÉFONO ---
+            OutlinedTextField(
+                value = telefono,
+                onValueChange = { telefono = it },
+                label = { Text("Teléfono de contacto") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
             Spacer(Modifier.height(24.dp))
 
             // --- BOTÓN REGISTRO ---
             Button(
                 onClick = {
-                    if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
-                        saveUserData(context, email, password)
-                        // Mostrar SnackBar
+                    if (name.isNotBlank() && email.isNotBlank() &&
+                        password.isNotBlank() && telefono.isNotBlank()
+                    ) {
+                        val usuario = Usuario(
+                            nombre = name,
+                            email = email,
+                            password = password,
+                            direccion = direccion,
+                            telefono = telefono,
+                            rol = "cliente" // valor por defecto
+                        )
+                        saveUserData(context, usuario)
                         scope.launch {
                             snackbarHostState.showSnackbar(
-                                message = "Registro exitoso 🎉",
+                                message = "Registro exitoso",
                                 withDismissAction = true,
                                 duration = SnackbarDuration.Short
                             )
                         }
-                        // Navegar después de un pequeño delay
                         scope.launch {
                             kotlinx.coroutines.delay(2000)
                             navController.navigate("login")
@@ -141,12 +173,16 @@ fun RegisterScreen(navController: NavController) {
     }
 }
 
-// --- Guarda usuario en SharedPreferences ---
-fun saveUserData(context: Context, email: String, password: String) {
+// --- Guarda usuario completo en SharedPreferences ---
+fun saveUserData(context: Context, usuario: Usuario) {
     val sharedPref = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     with(sharedPref.edit()) {
-        putString("user_email", email)
-        putString("user_password", password)
+        putString("user_nombre", usuario.nombre)
+        putString("user_email", usuario.email)
+        putString("user_password", usuario.password)
+        putString("user_telefono", usuario.direccion)
+        putString("user_telefono", usuario.telefono)
+        putString("user_rol", usuario.rol) // futuras funciones
         apply()
     }
 }
