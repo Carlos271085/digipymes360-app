@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.app.data.remote.NetworkModule
 import com.example.app.data.repository.UsuarioRepository
+import com.example.app.model.Usuario
 import com.example.app.model.UsuarioDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,4 +30,17 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
+
+    /*
+    fun register(usuario: Usuario, direccion: String, telefono: String) {
+        viewModelScope.launch {
+            try {
+                val result = repository.addUsuario(usuario, direccion, telefono)
+                _loginResult.value = result
+            } catch (e: Exception) {
+                _error.value = "Error al crear usuario: ${e.message}"
+            }
+        }
+    }
+     */
 }

@@ -1,6 +1,7 @@
 package com.example.app.view
 
 import android.content.Context
+import android.net.Uri
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.Image
@@ -17,10 +18,14 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.app.R // asegúrate de importar tu paquete correcto
 import com.example.app.ui.login.LoginViewModel
+import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController, viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun LoginScreen(
+    navController: NavController,
+    viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -30,10 +35,17 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = androi
     val loginResult by viewModel.loginResult.collectAsState()
     val error by viewModel.error.collectAsState()
 
+
     // Si el login fue exitoso
     LaunchedEffect(loginResult) {
         if (loginResult != null) {
-            navController.navigate("home")
+            loginResult?.let { usuario ->
+                val userJson = Uri.encode(Gson().toJson(usuario))
+                navController.navigate("home/$userJson") {
+                    popUpTo("login") { inclusive = true } // evita volver al login
+                }
+            }
+
         }
     }
 
@@ -47,14 +59,12 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = androi
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Iniciar Sesión") },
-                colors = TopAppBarDefaults.topAppBarColors(
+                title = { Text("Iniciar Sesión") }, colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        }
-    ) { pad ->
+        }) { pad ->
         Column(
             modifier = Modifier
                 .padding(pad)
@@ -104,11 +114,11 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = androi
                         // 🔹 Aquí llamamos a la API
                         viewModel.login(email, password)
                     } else {
-                        android.widget.Toast.makeText(context, "Ingresa email y contraseña", android.widget.Toast.LENGTH_SHORT).show()
+                        android.widget.Toast.makeText(
+                            context, "Ingresa email y contraseña", android.widget.Toast.LENGTH_SHORT
+                        ).show()
                     }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
+                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
@@ -118,7 +128,10 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = androi
             Spacer(Modifier.height(12.dp))
 
             TextButton(onClick = { navController.navigate("register") }) {
-                Text("¿No tienes cuenta? Regístrate aquí", color = MaterialTheme.colorScheme.secondary)
+                Text(
+                    "¿No tienes cuenta? Regístrate aquí",
+                    color = MaterialTheme.colorScheme.secondary
+                )
             }
 
             Spacer(Modifier.height(24.dp))

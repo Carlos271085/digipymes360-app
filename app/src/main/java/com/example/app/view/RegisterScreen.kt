@@ -13,16 +13,19 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.app.R
+import com.example.app.ui.login.LoginViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(navController: NavController,viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val context = LocalContext.current
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var direccion by remember {mutableStateOf("")}
+    var telefono by remember {mutableStateOf("")}
 
     // --- Snackbar setup ---
     val snackbarHostState = remember { SnackbarHostState() }
@@ -95,11 +98,28 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(Modifier.height(24.dp))
 
+            OutlinedTextField(
+                value = direccion,
+                onValueChange = { direccion = it },
+                label = { Text("Dirección") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(24.dp))
+
+            OutlinedTextField(
+                value = telefono,
+                onValueChange = { telefono = it },
+                label = { Text("Telefono") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(24.dp))
+
             // --- BOTÓN REGISTRO ---
             Button(
                 onClick = {
-                    if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
-                        saveUserData(context, email, password)
+                    if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank() && direccion.isNotBlank() && telefono.isNotBlank()) {
+                        //viewModel.register(name, email, password, direccion, telefono)
+
                         // Mostrar SnackBar
                         scope.launch {
                             snackbarHostState.showSnackbar(
