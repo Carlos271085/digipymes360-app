@@ -38,17 +38,52 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
 
     // --- DATOS DE PRODUCTOS ---
     val productos = listOf(
-        Producto(1, 101, 12, "Audífonos Bluetooth", "$14.990", R.drawable.audifono,
+        Producto(1,
+            101,
+            12,
+            "Audífonos Bluetooth",
+            "$14.990",
+            R.drawable.audifono,
             "Audífonos inalámbricos con cancelación de ruido, micrófono integrado y hasta 20 horas de batería."),
-        Producto(2, 102, 8, "Smartwatch Deportivo", "$25.990", R.drawable.reloj,
+
+        Producto(2,
+            102,
+            8,
+            "Smartwatch Deportivo",
+            "$25.990",
+            R.drawable.reloj,
             "Reloj inteligente con monitor de frecuencia cardíaca, podómetro y resistencia al agua IP68."),
-        Producto(3, 103, 10, "Parlante Portátil", "$19.990", R.drawable.microfono,
+
+        Producto(3,
+            103,
+            10,
+            "Parlante Portátil",
+            "$19.990",
+            R.drawable.microfono,
             "Parlante Bluetooth 5.0 con sonido estéreo envolvente y batería de 8 horas."),
-        Producto(4, 104, 15, "Teclado Mecánico RGB", "$29.990", R.drawable.teclado,
+
+        Producto(4,
+            104,
+            15,
+            "Teclado Mecánico RGB",
+            "$29.990",
+            R.drawable.teclado,
             "Teclado mecánico retroiluminado con switches de alta precisión y diseño ergonómico."),
-        Producto(5, 105, 20, "Mouse Gamer RGB", "$17.990", R.drawable.mouse,
+
+        Producto(5,
+            105,
+            20,
+            "Mouse Gamer RGB",
+            "$17.990",
+            R.drawable.mouse,
             "Mouse óptico gamer con sensor 6400 DPI, 7 botones programables y luces RGB."),
-        Producto(6, 106, 9, "Cámara Web HD 1080p", "$22.990", R.drawable.camara,
+
+        Producto(6,
+            106,
+            9,
+            "Cámara Web HD 1080p",
+            "$22.990",
+            R.drawable.camara,
             "Cámara Full HD 1080p con micrófono estéreo integrado y enfoque automático.")
     )
 
