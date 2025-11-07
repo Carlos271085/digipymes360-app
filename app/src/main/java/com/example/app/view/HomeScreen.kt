@@ -1,12 +1,16 @@
 package com.example.app.view
 
 import androidx.compose.foundation.Image
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -15,12 +19,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.app.R
+
 import com.example.app.ui.theme.*
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Color
@@ -87,104 +93,6 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
             "Cámara Full HD 1080p con micrófono estéreo integrado y enfoque automático.")
     )
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-
-        // --- APP BAR SUPERIOR ---
-        topBar = {
-            LargeTopAppBar(
-                title = {
-                    Text(
-                        "PYMES 360",
-                        fontSize = 22.sp,
-                        color = Color.White
-                    )
-                },
-                colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = BlueDark
-                ),
-                actions = {
-                    // --- CARRITO CON CONTADOR ---
-                    Box {
-                        IconButton(onClick = { navController.navigate("carro_compras") }) {
-                            Icon(
-                                Icons.Default.ShoppingCart,
-                                contentDescription = "Carrito",
-                                tint = Color.White
-                            )
-                        }
-                        if (viewModel.totalProductos > 0) {
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .offset(x = (-2).dp, y = 2.dp)
-                                    .size(18.dp)
-                                    .background(OrangePrimary, shape = CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = viewModel.totalProductos.toString(),
-                                    color = Color.White,
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            }
-                        }
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        },
-
-        // --- BARRA DE NAVEGACIÓN INFERIOR ---
-        bottomBar = {
-            NavigationBar(containerColor = BlueDark) {
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { /* estás en inicio */ },
-                    icon = { Icon(Icons.Default.Search, contentDescription = "Inicio", tint = OrangePrimary) },
-                    label = { Text("Inicio", color = Color.White) }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("carro_compras") },
-                    icon = {
-                        Box {
-                            Icon(Icons.Default.ShoppingCart, contentDescription = "Carrito", tint = Color.White)
-                            if (viewModel.totalProductos > 0) {
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.TopEnd)
-                                        .offset(x = 6.dp, y = (-2).dp)
-                                        .size(14.dp)
-                                        .background(OrangePrimary, shape = CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = viewModel.totalProductos.toString(),
-                                        color = Color.White,
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                }
-                            }
-                        }
-                    },
-                    label = { Text("Carrito", color = Color.White) }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* futuro perfil */ },
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Perfil", tint = Color.White) },
-                    label = { Text("Perfil", color = Color.White) }
-                )
-            }
-        }
-    ) { pad ->
-        Column(
-            modifier = Modifier
-                .padding(pad)
-                .fillMaxSize()
-                .background(LightBackground)
-        ) {
             // --- BARRA DE BÚSQUEDA ---
             DockedSearchBar(
                 query = searchQuery,
@@ -275,9 +183,26 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                     }
                 }
             }
+
+            Text("Bienvenido a la tienda digital", style = MaterialTheme.typography.headlineSmall)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.gato_naranja),
+                contentDescription = "Logo Pymes 360",
+                modifier = Modifier
+                    .size(256.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.CenterHorizontally)
+
+
+            )
+
+            Text("Usuario: $user", style = MaterialTheme.typography.bodyLarge)
+            Text("Email: $email", style = MaterialTheme.typography.bodyLarge)
         }
-    }
-}
+    
+
 
 // --- Modelo de producto ---
 data class Producto(

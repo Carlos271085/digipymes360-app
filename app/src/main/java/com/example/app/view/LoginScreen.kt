@@ -1,6 +1,7 @@
 package com.example.app.view
 
 import android.content.Context
+import android.net.Uri
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.Image
@@ -15,31 +16,63 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+
 import com.example.app.R
 import androidx.compose.ui.graphics.Color
 import com.example.app.ui.theme.*
 
+import com.example.app.ui.login.LoginViewModel
+import com.google.gson.Gson
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController,
+    viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val canUseBiometrics = remember { canAuthenticateWithBiometrics(context) }
+    //val canUseBiometrics = remember { canAuthenticateWithBiometrics(context) }
+
+    val loginResult by viewModel.loginResult.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+
+    // Si el login fue exitoso
+    LaunchedEffect(loginResult) {
+        if (loginResult != null) {
+            loginResult?.let { usuario ->
+                val userJson = Uri.encode(Gson().toJson(usuario))
+                navController.navigate("home/$userJson") {
+                    popUpTo("login") { inclusive = true } // evita volver al login
+                }
+            }
+
+        }
+    }
+
+    // Si hubo error
+    LaunchedEffect(error) {
+        error?.let {
+            android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Scaffold(
         // --- BARRA SUPERIOR CON TU COLOR SECUNDARIO (BlueDark) ---
         topBar = {
             TopAppBar(
-                title = { Text("Iniciar Sesión", color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = BlueDark, // azul petróleo de tu paleta
-                    titleContentColor = Color.White
+
+                title = { Text("Iniciar Sesión") }, colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+
                 )
             )
-        }
-    ) { pad ->
+        }) { pad ->
         Column(
             modifier = Modifier
                 .padding(pad)
@@ -48,8 +81,6 @@ fun LoginScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            // --- LOGO CENTRADO ---
             Image(
                 painter = painterResource(id = R.drawable.logodigipymes),
                 contentDescription = "Logo Pymes 360",
@@ -59,14 +90,13 @@ fun LoginScreen(navController: NavController) {
             )
 
             Text(
-                text = "Bienvenido a PYMES 360",
+                text = "Bienvenido(a) a DIGIPYMES360",
                 style = MaterialTheme.typography.headlineSmall,
                 color = OrangePrimary // Naranja principal de tu paleta
             )
 
             Spacer(Modifier.height(24.dp))
 
-            // --- CAMPOS DE TEXTO ---
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -96,17 +126,18 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(16.dp))
 
-            // --- BOTÓN LOGIN ---
             Button(
                 onClick = {
                     if (email.isNotEmpty() && password.isNotEmpty()) {
-                        navController.navigate("home")
+                        viewModel.login(email, password)
+                    } else {
+                        android.widget.Toast.makeText(
+                            context, "Ingresa email y contraseña", android.widget.Toast.LENGTH_SHORT
+                        ).show()
                     }
-                },
-                modifier = Modifier.wrapContentWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = OrangePrimary, // color principal
-                    contentColor = Color.White
+                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+
                 )
             ) {
                 Text("Ingresar")
@@ -114,7 +145,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(12.dp))
 
-            // --- BOTÓN REGISTRO ---
             TextButton(onClick = { navController.navigate("register") }) {
                 Text(
                     "¿No tienes cuenta? Regístrate aquí",
@@ -124,71 +154,7 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(24.dp))
 
-            // --- HUELLA DACTILAR ---
-            if (canUseBiometrics) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    val activity = context as? androidx.fragment.app.FragmentActivity
-                    IconButton(
-                        onClick = {
-                            activity?.let {
-                                authenticateWithBiometrics(it) { navController.navigate("home") }
-                            }
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.huella),
-                            contentDescription = "Huella dactilar",
-                            tint = BlueDark,
-                            modifier = Modifier.size(64.dp)
-                        )
-                    }
-                    Text(
-                        text = "Presiona para iniciar sesión con tu huella dactilar",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = BlueDark
-                    )
-                }
-            }
         }
     }
 }
 
-// --- Funciones biométricas (SIN CAMBIOS) ---
-
-fun canAuthenticateWithBiometrics(context: Context): Boolean {
-    val biometricManager = BiometricManager.from(context)
-    val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or
-            BiometricManager.Authenticators.DEVICE_CREDENTIAL
-
-    return biometricManager.canAuthenticate(authenticators) ==
-            BiometricManager.BIOMETRIC_SUCCESS
-}
-
-fun authenticateWithBiometrics(activity: androidx.fragment.app.FragmentActivity, onSuccess: () -> Unit) {
-    val executor = ContextCompat.getMainExecutor(activity)
-    val biometricPrompt = BiometricPrompt(
-        activity,
-        executor,
-        object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                onSuccess()
-            }
-
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                super.onAuthenticationError(errorCode, errString)
-            }
-        }
-    )
-
-    val promptInfo = BiometricPrompt.PromptInfo.Builder()
-        .setTitle("Autenticación biométrica")
-        .setSubtitle("Usa tu huella o PIN para iniciar sesión")
-        .setAllowedAuthenticators(
-            BiometricManager.Authenticators.BIOMETRIC_STRONG or
-                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
-        )
-        .build()
-
-    biometricPrompt.authenticate(promptInfo)
-}

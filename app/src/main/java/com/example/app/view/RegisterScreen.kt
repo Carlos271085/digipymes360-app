@@ -14,19 +14,20 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.app.R
 import com.example.app.model.Usuario
+import com.example.app.ui.login.LoginViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(navController: NavController,viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val context = LocalContext.current
 
     // --- Variables de estado ---
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var direccion by remember { mutableStateOf("") }
-    var telefono by remember { mutableStateOf("") }
+    var direccion by remember {mutableStateOf("")}
+    var telefono by remember {mutableStateOf("")}
 
     // --- Snackbar setup ---
     val snackbarHostState = remember { SnackbarHostState() }
@@ -119,9 +120,26 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(Modifier.height(24.dp))
 
+            OutlinedTextField(
+                value = direccion,
+                onValueChange = { direccion = it },
+                label = { Text("Dirección") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(24.dp))
+
+            OutlinedTextField(
+                value = telefono,
+                onValueChange = { telefono = it },
+                label = { Text("Telefono") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(24.dp))
+
             // --- BOTÓN REGISTRO ---
             Button(
                 onClick = {
+
                     if (name.isNotBlank() && email.isNotBlank() &&
                         password.isNotBlank() && telefono.isNotBlank()
                     ) {
@@ -134,6 +152,7 @@ fun RegisterScreen(navController: NavController) {
                             rol = "cliente" // valor por defecto
                         )
                         saveUserData(context, usuario)
+
                         scope.launch {
                             snackbarHostState.showSnackbar(
                                 message = "Registro exitoso",
