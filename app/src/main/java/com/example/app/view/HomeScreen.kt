@@ -113,7 +113,7 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                                 tint = Color.White
                             )
                         }
-                        if (viewModel.totalProductos > 0) {
+                        if (viewModel.totalProductos.value > 0) {
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
@@ -123,7 +123,7 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = viewModel.totalProductos.toString(),
+                                    text = viewModel.totalProductos.value.toString(),
                                     color = Color.White,
                                     style = MaterialTheme.typography.labelSmall
                                 )
@@ -150,7 +150,7 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                     icon = {
                         Box {
                             Icon(Icons.Default.ShoppingCart, contentDescription = "Carrito", tint = Color.White)
-                            if (viewModel.totalProductos > 0) {
+                            if (viewModel.totalProductos.value > 0) {
                                 Box(
                                     modifier = Modifier
                                         .align(Alignment.TopEnd)
@@ -160,7 +160,7 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = viewModel.totalProductos.toString(),
+                                        text = viewModel.totalProductos.value.toString(),
                                         color = Color.White,
                                         style = MaterialTheme.typography.labelSmall
                                     )

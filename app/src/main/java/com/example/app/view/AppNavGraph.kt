@@ -17,25 +17,28 @@ fun AppNavGraph(navController: NavHostController) {
         navController = navController,
         startDestination = "login"
     ) {
-        // --- LOGIN ---
+        // LOGIN
         composable("login") {
             LoginScreen(navController)
         }
 
-        // --- REGISTRO ---
+        // REGISTRO
         composable("register") {
             RegisterScreen(navController)
         }
 
-        // --- HOME ---
+        // HOME
         composable("home") {
             HomeScreen(navController, carritoViewModel)
         }
 
-        // --- CARRITO DE COMPRAS ---
+        // CARRITO DE COMPRAS
         composable("carro_compras") {
             CarroDeComprasScreen(navController, carritoViewModel)
         }
+
+        // COMPRA DEL CARRITO
+        composable("compra_exitosa") { CompraExitosaScreen(navController) }
 
     }
 }

@@ -16,6 +16,8 @@ import androidx.navigation.NavController
 import com.example.app.R
 import com.example.app.ui.theme.*
 import com.example.app.viewmodel.CarritoViewModel
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +93,12 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = OrangePrimary
                                     )
+                                    // --- MOSTRAR CANTIDAD ---
+                                    Text(
+                                        "Cantidad: ${producto.stock}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = TextSecondary
+                                    )
                                 }
 
                                 // --- BOTÓN PARA ELIMINAR ---
@@ -105,6 +113,40 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
                         }
                     }
                 }
+
+                Spacer(Modifier.height(16.dp))
+
+                // --- TOTAL DE COMPRA ---
+                val total = carrito.sumOf {
+                    it.precio.replace("$", "").replace(".", "").toInt() * it.stock
+                }
+                Text(
+                    text = "Total: $$total",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = TextPrimary,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                // --- BOTÓN PARA COMPRAR CARRITO ---
+                val context = LocalContext.current
+                Button(
+                    onClick = {
+                        val comprado = viewModel.comprarCarrito()
+                        if (comprado) {
+                            Toast.makeText(context, "¡Compra realizada con éxito!", Toast.LENGTH_SHORT).show()
+                            navController.navigate("compra_exitosa") {
+                                popUpTo("carro_compras") { inclusive = true }
+                            }
+                        } else {
+                            Toast.makeText(context, "El carrito está vacío", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = OrangePrimary),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Comprar ahora", color = Color.White)
+                }
+
 
                 Spacer(Modifier.height(16.dp))
 
@@ -131,4 +173,3 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
         }
     }
 }
-
