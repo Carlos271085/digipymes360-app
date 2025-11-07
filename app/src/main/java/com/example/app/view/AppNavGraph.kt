@@ -3,13 +3,16 @@ package com.example.app.view
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.app.viewmodel.CarritoViewModel
+import com.example.app.model.UsuarioDTO
+import com.google.gson.Gson
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
-
 
     val carritoViewModel: CarritoViewModel = viewModel()
 
@@ -17,6 +20,7 @@ fun AppNavGraph(navController: NavHostController) {
         navController = navController,
         startDestination = "login"
     ) {
+
         // LOGIN
         composable("login") {
             LoginScreen(navController)
@@ -27,9 +31,25 @@ fun AppNavGraph(navController: NavHostController) {
             RegisterScreen(navController)
         }
 
-        // HOME
+        // HOME SIMPLE (sin datos de usuario)
         composable("home") {
             HomeScreen(navController, carritoViewModel)
+        }
+
+        // HOME CON DATOS DE USUARIO (desde Login)
+        composable(
+            route = "home/{userJson}",
+            arguments = listOf(navArgument("userJson") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userJson = backStackEntry.arguments?.getString("userJson")
+            val usuario = Gson().fromJson(userJson, UsuarioDTO::class.java)
+
+            HomeScreen(
+                navController = navController,
+                viewModel = carritoViewModel,
+                user = usuario.nombre ?: "Sin nombre",
+                email = usuario.email ?: "Sin email"
+            )
         }
 
         // CARRITO DE COMPRAS
@@ -37,10 +57,12 @@ fun AppNavGraph(navController: NavHostController) {
             CarroDeComprasScreen(navController, carritoViewModel)
         }
 
-        // COMPRA DEL CARRITO
-        composable("compra_exitosa") { CompraExitosaScreen(navController) }
-
+        // COMPRA EXITOSA
+        composable("compra_exitosa") {
+            CompraExitosaScreen(navController)
+        }
     }
 }
+
 
 

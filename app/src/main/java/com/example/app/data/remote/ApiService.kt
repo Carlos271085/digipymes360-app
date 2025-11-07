@@ -1,33 +1,27 @@
 package com.example.app.data.remote
 
+import com.example.app.model.Usuario
+import com.example.app.model.UsuarioDTO
 import com.example.app.model.*
 import retrofit2.http.*
 
 interface ApiService {
-    // Autenticación
-    @POST("auth/login")
-    suspend fun login(@Body request: LoginRequest): AuthResponse
+    @GET("api/v2/user/loginDP360")
+    suspend fun loginDP360(
+        @Query("email") email: String,
+        @Query("password") password: String
+    ): Boolean
 
-    // Usuario autenticado
-    @GET("users/me")
-    suspend fun me(@Header("Authorization") bearer: String): UserProfile
+    @GET("api/v2/user/loginINFO")
+    suspend fun loginINFO(
+        @Query("email") email: String,
+        @Query("password") password: String
+    ): UsuarioDTO
 
-    // Billetera
-    @GET("wallet/balance")
-    suspend fun getBalance(@Header("Authorization") bearer: String): BalanceResponse
-
-    // Enviar dinero
-    @POST("payments/send")
-    suspend fun sendPayment(
-        @Header("Authorization") bearer: String,
-        @Body request: PaymentRequest
-    ): PaymentResponse
-
-    // Transacciones
-    @GET("transactions")
-    suspend fun getTransactions(
-        @Header("Authorization") bearer: String,
-        @Query("page") page: Int = 1,
-        @Query("size") size: Int = 10
-    ): PagedTransactions
+    @POST("api/v2/user/add")
+    suspend fun addUsuario(
+        @Body usuario: Usuario,
+        @Query("direccion") direccion: String,
+        @Query("telefono") telefono: String
+    ): Usuario
 }
