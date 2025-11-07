@@ -8,6 +8,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+
+/*
 import com.example.app.viewmodel.WalletViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,14 +41,19 @@ fun MovementsScreen(
         LazyColumn(Modifier.padding(pad)) {
             items(state.recent.size) { i ->
                 val tx = state.recent[i]
+
+
                 ListItem(
                     headlineContent = { Text(tx.concept ?: "Transacción") },
                     supportingContent = { Text(tx.createdAt) },
                     trailingContent = { Text("${tx.amount} ${tx.currency}") }
                 )
+
+
                 Divider()
             }
         }
     }
 }
 
+//*/
