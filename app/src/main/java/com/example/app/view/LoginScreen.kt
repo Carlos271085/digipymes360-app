@@ -15,10 +15,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
-import com.example.app.R // asegúrate de importar tu paquete correcto
+import com.example.app.R
+import androidx.compose.ui.graphics.Color
+import com.example.app.ui.theme.*
 import com.example.app.ui.login.LoginViewModel
 import com.google.gson.Gson
+import android.widget.Toast
+import androidx.compose.ui.text.style.TextAlign
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,14 +32,13 @@ fun LoginScreen(
     viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val context = LocalContext.current
+    val activity = context as FragmentActivity // ✅ necesario para el BiometricPrompt
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    //val canUseBiometrics = remember { canAuthenticateWithBiometrics(context) }
-
     val loginResult by viewModel.loginResult.collectAsState()
     val error by viewModel.error.collectAsState()
-
 
     // Si el login fue exitoso
     LaunchedEffect(loginResult) {
@@ -42,29 +46,30 @@ fun LoginScreen(
             loginResult?.let { usuario ->
                 val userJson = Uri.encode(Gson().toJson(usuario))
                 navController.navigate("home/$userJson") {
-                    popUpTo("login") { inclusive = true } // evita volver al login
+                    popUpTo("login") { inclusive = true }
                 }
             }
-
         }
     }
 
     // Si hubo error
     LaunchedEffect(error) {
         error?.let {
-            android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Iniciar Sesión") }, colors = TopAppBarDefaults.topAppBarColors(
+                title = { Text("Iniciar Sesión") },
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        }) { pad ->
+        }
+    ) { pad ->
         Column(
             modifier = Modifier
                 .padding(pad)
@@ -74,17 +79,17 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.logodigipymes),
                 contentDescription = "Logo Pymes 360",
                 modifier = Modifier
-                    .size(150.dp)
+                    .size(110.dp)
                     .padding(bottom = 16.dp)
             )
 
             Text(
                 text = "Bienvenido(a) a DIGIPYMES360",
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary
+                color = OrangePrimary
             )
 
             Spacer(Modifier.height(24.dp))
@@ -92,8 +97,13 @@ fun LoginScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Correo electrónico") },
-                modifier = Modifier.fillMaxWidth()
+                label = { Text("Correo electrónico", color = TextSecondary) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = OrangePrimary,
+                    unfocusedBorderColor = BlueDark,
+                    cursorColor = OrangePrimary
+                )
             )
 
             Spacer(Modifier.height(12.dp))
@@ -101,9 +111,14 @@ fun LoginScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Contraseña") },
+                label = { Text("Contraseña", color = TextSecondary) },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = OrangePrimary,
+                    unfocusedBorderColor = BlueDark,
+                    cursorColor = OrangePrimary
+                )
             )
 
             Spacer(Modifier.height(16.dp))
@@ -111,18 +126,21 @@ fun LoginScreen(
             Button(
                 onClick = {
                     if (email.isNotEmpty() && password.isNotEmpty()) {
-                        // 🔹 Aquí llamamos a la API
                         viewModel.login(email, password)
                     } else {
-                        android.widget.Toast.makeText(
-                            context, "Ingresa email y contraseña", android.widget.Toast.LENGTH_SHORT
+                        Toast.makeText(
+                            context,
+                            "Ingresa email y contraseña",
+                            Toast.LENGTH_SHORT
                         ).show()
                     }
-                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text("Ingresar", color = MaterialTheme.colorScheme.onPrimary)
+                Text("Ingresar")
             }
 
             Spacer(Modifier.height(12.dp))
@@ -130,12 +148,90 @@ fun LoginScreen(
             TextButton(onClick = { navController.navigate("register") }) {
                 Text(
                     "¿No tienes cuenta? Regístrate aquí",
-                    color = MaterialTheme.colorScheme.secondary
+                    color = BlueInfo
                 )
             }
 
             Spacer(Modifier.height(24.dp))
 
+            // ✅ BLOQUE DE HUELLA DACTILAR
+            val biometricManager = BiometricManager.from(context)
+            val canUseBiometrics = biometricManager.canAuthenticate(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG
+                        or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            ) == BiometricManager.BIOMETRIC_SUCCESS
+
+            if (canUseBiometrics) {
+                Button(
+                    onClick = {
+                        val executor = ContextCompat.getMainExecutor(context)
+                        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+                            .setTitle("Acceso con huella digital")
+                            .setSubtitle("Usa tu huella para ingresar")
+                            .setNegativeButtonText("Cancelar")
+                            .build()
+
+                        val biometricPrompt = BiometricPrompt(
+                            activity,
+                            executor,
+                            object : BiometricPrompt.AuthenticationCallback() {
+                                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                                    super.onAuthenticationSucceeded(result)
+                                    Toast.makeText(
+                                        context,
+                                        "Huella verificada con éxito",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    navController.navigate("home") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                }
+
+                                override fun onAuthenticationError(
+                                    errorCode: Int,
+                                    errString: CharSequence
+                                ) {
+                                    super.onAuthenticationError(errorCode, errString)
+                                    Toast.makeText(
+                                        context,
+                                        "Error: $errString",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                override fun onAuthenticationFailed() {
+                                    super.onAuthenticationFailed()
+                                    Toast.makeText(
+                                        context,
+                                        "Huella no reconocida",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            })
+
+                        biometricPrompt.authenticate(promptInfo)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = BlueDark),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.huella),
+                        contentDescription = "Huella",
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("Ingresar con huella", color = Color.White)
+                }
+            } else {
+                Text(
+                    "Huella digital no disponible en este dispositivo",
+                    color = TextSecondary,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
+
