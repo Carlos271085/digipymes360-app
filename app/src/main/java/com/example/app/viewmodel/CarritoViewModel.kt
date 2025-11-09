@@ -3,7 +3,8 @@ package com.example.app.viewmodel
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.app.view.Producto
+import com.example.app.model.Producto
+
 
 class CarritoViewModel : ViewModel() {
 

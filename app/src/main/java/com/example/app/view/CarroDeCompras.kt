@@ -18,7 +18,7 @@ import com.example.app.ui.theme.*
 import com.example.app.viewmodel.CarritoViewModel
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
-
+import com.example.app.model.Producto;
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewModel) {

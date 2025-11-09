@@ -32,11 +32,7 @@ fun AppNavGraph(navController: NavHostController) {
         }
 
         // HOME SIMPLE (sin datos de usuario)
-        composable("home") {
-            HomeScreen(navController, carritoViewModel)
-        }
 
-        // HOME CON DATOS DE USUARIO (desde Login)
         composable(
             route = "home/{userJson}",
             arguments = listOf(navArgument("userJson") { type = NavType.StringType })
@@ -47,6 +43,20 @@ fun AppNavGraph(navController: NavHostController) {
             HomeScreen(
                 navController = navController,
                 viewModel = carritoViewModel,
+                user = usuario.nombre ?: "Sin nombre",
+                email = usuario.email ?: "Sin email"
+            )
+        }
+
+        composable(
+            route = "profile/{userJson}",
+            arguments = listOf(navArgument("userJson") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userJson = backStackEntry.arguments?.getString("userJson")
+            val usuario = Gson().fromJson(userJson, UsuarioDTO::class.java)
+
+            ProfileScreen(
+                navController = navController,
                 user = usuario.nombre ?: "Sin nombre",
                 email = usuario.email ?: "Sin email"
             )
