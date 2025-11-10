@@ -1,22 +1,21 @@
 package com.example.app.view
 
-import android.content.Context
 import android.net.Uri
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricPrompt
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.example.app.R // asegúrate de importar tu paquete correcto
+import com.example.app.R
+import com.example.app.ui.theme.* // ✅ importa tu paleta de colores
 import com.example.app.ui.login.LoginViewModel
 import com.google.gson.Gson
 
@@ -30,41 +29,39 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    //val canUseBiometrics = remember { canAuthenticateWithBiometrics(context) }
-
     val loginResult by viewModel.loginResult.collectAsState()
     val error by viewModel.error.collectAsState()
 
 
-    // Si el login fue exitoso
     LaunchedEffect(loginResult) {
         if (loginResult != null) {
             loginResult?.let { usuario ->
                 val userJson = Uri.encode(Gson().toJson(usuario))
                 navController.navigate("home/$userJson") {
-                    popUpTo("login") { inclusive = true } // evita volver al login
+                    popUpTo("login") { inclusive = true }
                 }
             }
-
         }
     }
 
-    // Si hubo error
+
     LaunchedEffect(error) {
         error?.let {
-            android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Iniciar Sesión") }, colors = TopAppBarDefaults.topAppBarColors(
+                title = { Text("Iniciar Sesión") },
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        }) { pad ->
+        }
+    ) { pad ->
         Column(
             modifier = Modifier
                 .padding(pad)
@@ -74,17 +71,17 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.logodigipymes),
                 contentDescription = "Logo Pymes 360",
                 modifier = Modifier
-                    .size(150.dp)
+                    .size(110.dp)
                     .padding(bottom = 16.dp)
             )
 
             Text(
                 text = "Bienvenido(a) a DIGIPYMES360",
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary
+                color = OrangePrimary
             )
 
             Spacer(Modifier.height(24.dp))
@@ -92,8 +89,13 @@ fun LoginScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Correo electrónico") },
-                modifier = Modifier.fillMaxWidth()
+                label = { Text("Correo electrónico", color = TextSecondary) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = OrangePrimary,
+                    unfocusedBorderColor = BlueDark,
+                    cursorColor = OrangePrimary
+                )
             )
 
             Spacer(Modifier.height(12.dp))
@@ -101,9 +103,14 @@ fun LoginScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Contraseña") },
+                label = { Text("Contraseña", color = TextSecondary) },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = OrangePrimary,
+                    unfocusedBorderColor = BlueDark,
+                    cursorColor = OrangePrimary
+                )
             )
 
             Spacer(Modifier.height(16.dp))
@@ -111,18 +118,21 @@ fun LoginScreen(
             Button(
                 onClick = {
                     if (email.isNotEmpty() && password.isNotEmpty()) {
-                        // 🔹 Aquí llamamos a la API
                         viewModel.login(email, password)
                     } else {
-                        android.widget.Toast.makeText(
-                            context, "Ingresa email y contraseña", android.widget.Toast.LENGTH_SHORT
+                        Toast.makeText(
+                            context,
+                            "Ingresa email y contraseña",
+                            Toast.LENGTH_SHORT
                         ).show()
                     }
-                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = OrangePrimary
                 )
             ) {
-                Text("Ingresar", color = MaterialTheme.colorScheme.onPrimary)
+                Text("Ingresar", color = Color.White)
             }
 
             Spacer(Modifier.height(12.dp))
@@ -130,12 +140,11 @@ fun LoginScreen(
             TextButton(onClick = { navController.navigate("register") }) {
                 Text(
                     "¿No tienes cuenta? Regístrate aquí",
-                    color = MaterialTheme.colorScheme.secondary
+                    color = BlueInfo
                 )
             }
 
             Spacer(Modifier.height(24.dp))
-
         }
     }
 }
