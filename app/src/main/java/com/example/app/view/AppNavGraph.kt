@@ -16,12 +16,12 @@ fun AppNavGraph(navController: NavHostController) {
 
     val carritoViewModel: CarritoViewModel = viewModel()
 
-    val gson = Gson().toJson(UsuarioDTO(0,"Usuario de Prueba","email@mail.com","0"))
+    val gson = Gson().toJson(UsuarioDTO(0, "Usuario de Prueba", "email@mail.com", "0"))
 
     NavHost(
         navController = navController,
         //startDestination = "login"
-        startDestination = "home/$gson"//Test only
+        startDestination = "home/$gson" // Test only
     ) {
 
         // LOGIN
@@ -34,8 +34,7 @@ fun AppNavGraph(navController: NavHostController) {
             RegisterScreen(navController)
         }
 
-        // HOME SIMPLE (sin datos de usuario)
-
+        // HOME
         composable(
             route = "home/{userJson}",
             arguments = listOf(navArgument("userJson") { type = NavType.StringType })
@@ -51,6 +50,7 @@ fun AppNavGraph(navController: NavHostController) {
             )
         }
 
+        // PERFIL (desde JSON)
         composable(
             route = "profile/{userJson}",
             arguments = listOf(navArgument("userJson") { type = NavType.StringType })
@@ -71,11 +71,19 @@ fun AppNavGraph(navController: NavHostController) {
         }
 
         // COMPRA EXITOSA
-        composable("compra_exitosa") {
-            CompraExitosaScreen(navController)
+        composable("compra_exitosa") { CompraExitosaScreen(navController) }
+
+        // 🆕 NUEVAS RUTAS (DEBEN ESTAR DENTRO DEL NAVHOST)
+        composable("perfil_usuario") {
+            ProfileScreen(navController, user = "Carlos", email = "carlos@pymes360.cl")
+        }
+
+        composable("historial_compras") {
+            HistorialComprasScreen(navController)
+        }
+
+        composable("contacto") {
+            ContactoScreen(navController)
         }
     }
 }
-
-
-
