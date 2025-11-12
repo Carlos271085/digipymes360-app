@@ -16,9 +16,12 @@ fun AppNavGraph(navController: NavHostController) {
 
     val carritoViewModel: CarritoViewModel = viewModel()
 
+    val gson = Gson().toJson(UsuarioDTO(0,"Usuario de Prueba","email@mail.com","0"))
+
     NavHost(
         navController = navController,
-        startDestination = "login"
+        //startDestination = "login"
+        startDestination = "home/$gson"//Test only
     ) {
 
         // LOGIN
