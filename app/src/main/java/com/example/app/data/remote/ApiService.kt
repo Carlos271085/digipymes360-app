@@ -20,7 +20,7 @@ interface ApiService {
 
     @POST("api/v2/user/add")
     suspend fun addUsuario(
-        @Body usuario: Usuario,
+        @Body usuario: UsuarioRegistro,
         @Query("direccion") direccion: String,
         @Query("telefono") telefono: String
     ): Usuario

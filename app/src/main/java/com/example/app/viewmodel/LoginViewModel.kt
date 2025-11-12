@@ -6,6 +6,7 @@ import com.example.app.data.remote.NetworkModule
 import com.example.app.data.repository.UsuarioRepository
 import com.example.app.model.Usuario
 import com.example.app.model.UsuarioDTO
+import com.example.app.model.UsuarioRegistro
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,6 +17,9 @@ class LoginViewModel : ViewModel() {
 
     private val _loginResult = MutableStateFlow<UsuarioDTO?>(null)
     val loginResult: StateFlow<UsuarioDTO?> = _loginResult
+
+    private val _registerResult = MutableStateFlow<Usuario?>(null)
+    val registerResult: StateFlow<Usuario?> = _registerResult
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
@@ -31,16 +35,16 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    /*
-    fun register(usuario: Usuario, direccion: String, telefono: String) {
+    //*
+    fun registrar(usuario: UsuarioRegistro, direccion: String, telefono: String) {
         viewModelScope.launch {
             try {
                 val result = repository.addUsuario(usuario, direccion, telefono)
-                _loginResult.value = result
+                _registerResult.value = result
             } catch (e: Exception) {
                 _error.value = "Error al crear usuario: ${e.message}"
             }
         }
     }
-     */
+    //*/
 }

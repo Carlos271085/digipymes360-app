@@ -10,8 +10,8 @@ object NetworkModule {
 
     //private const val BASE_URL = "http://35.173.75.94:8082/"
     //private const val BASE_URL = "http://98.90.175.159:8080/"//Carlos
-    //private const val BASE_URL = "http://35.173.75.94:8080/"//Eduardo
-    private const val BASE_URL = "http://98.95.22.3:8080/"
+    private const val BASE_URL = "http://35.173.75.94:8080/"//Eduardo
+    //private const val BASE_URL = "http://98.95.22.3:8080/"//Karina
 
 
     private val logging = HttpLoggingInterceptor().apply {

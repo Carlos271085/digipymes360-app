@@ -1,6 +1,7 @@
 package com.example.app.view
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -13,10 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.app.R
 import com.example.app.model.Usuario
+import com.example.app.model.UsuarioRegistro
 import com.example.app.ui.login.LoginViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -41,6 +45,19 @@ fun RegisterScreen(
 
     // --- Scroll ---
     val scrollState = rememberScrollState()
+    val registerResult by viewModel.loginResult.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    LaunchedEffect(registerResult) {
+        if (registerResult != null) {
+            registerResult?.let { usuario ->
+                val userJson = Uri.encode(Gson().toJson(usuario))
+                navController.navigate("home/$userJson") {
+                    popUpTo("login") { inclusive = true }
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -160,6 +177,16 @@ fun RegisterScreen(
                             )
                             saveUserData(context, usuario)
 
+                            val usuario_a_registrar : UsuarioRegistro
+
+                            usuario_a_registrar = UsuarioRegistro(
+                                nombre = name,
+                                email = email,
+                                password = password
+                            )
+                            viewModel.registrar(usuario_a_registrar,direccion,telefono)
+
+
                             scope.launch {
                                 snackbarHostState.showSnackbar(
                                     message = "Registro exitoso",
@@ -206,6 +233,8 @@ fun mostrarError(scope: CoroutineScope, snackbarHostState: SnackbarHostState, me
 // --- Guarda usuario completo en SharedPreferences ---
 fun saveUserData(context: Context, usuario: Usuario) {
     val sharedPref = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+
+
     with(sharedPref.edit()) {
         putString("user_nombre", usuario.nombre)
         putString("user_email", usuario.email)
@@ -214,7 +243,12 @@ fun saveUserData(context: Context, usuario: Usuario) {
         putString("user_telefono", usuario.telefono)
         putString("user_rol", usuario.rol)
         apply()
+
+
     }
+
+
+
 }
 
 
