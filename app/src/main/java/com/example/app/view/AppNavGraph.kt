@@ -24,6 +24,7 @@ fun AppNavGraph(navController: NavHostController) {
         startDestination = "home/$gson"//Test only
     ) {
 
+        
         // LOGIN
         composable("login") {
             LoginScreen(navController)
