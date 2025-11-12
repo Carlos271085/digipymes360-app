@@ -2,10 +2,9 @@ package com.example.app.data.remote
 
 import com.example.app.model.Usuario
 import com.example.app.model.UsuarioDTO
-import com.example.app.model.*
 import retrofit2.http.*
 
-interface ApiService {
+interface ApiService_Cliente {
     @GET("api/v2/user/loginDP360")
     suspend fun loginDP360(
         @Query("email") email: String,
@@ -20,7 +19,7 @@ interface ApiService {
 
     @POST("api/v2/user/add")
     suspend fun addUsuario(
-        @Body usuario: UsuarioRegistro,
+        @Body usuario: Usuario,
         @Query("direccion") direccion: String,
         @Query("telefono") telefono: String
     ): Usuario

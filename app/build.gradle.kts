@@ -75,6 +75,12 @@ dependencies {
 
         //IMPORTAR MATERIAL DESIGN
         implementation("androidx.compose.material3:material3")
+
+        //Implementar servicio de locación
+        implementation("com.google.android.gms:play-services-location:21.3.0")
+
+        implementation(libs.play.services.location)
+
     }
 
 
