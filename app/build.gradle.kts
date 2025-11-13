@@ -67,6 +67,8 @@ dependencies {
         //Huella dactilar
         implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
+        implementation(libs.biometric)
+
         //Data Store
         implementation("androidx.datastore:datastore-preferences:1.1.1")
 
