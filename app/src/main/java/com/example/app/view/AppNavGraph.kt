@@ -16,12 +16,14 @@ fun AppNavGraph(navController: NavHostController) {
 
     val carritoViewModel: CarritoViewModel = viewModel()
 
-    val gson = Gson().toJson(UsuarioDTO(0,"Usuario de Prueba","email@mail.com","0"))
+    val gson = Gson().toJson(UsuarioDTO(0, "Usuario de Prueba", "email@mail.com", "0"))
 
     NavHost(
         navController = navController,
         //startDestination = "login"
+
         startDestination = "home" // Test only
+
     ) {
 
         // LOGIN
@@ -34,8 +36,7 @@ fun AppNavGraph(navController: NavHostController) {
             RegisterScreen(navController)
         }
 
-        // HOME SIMPLE (sin datos de usuario)
-
+        // HOME
         composable(
             route = "home",
 
@@ -63,6 +64,7 @@ fun AppNavGraph(navController: NavHostController) {
         // COMPRA EXITOSA
         composable("compra_exitosa") { CompraExitosaScreen(navController) }
 
+
         // 🆕 NUEVAS RUTAS (DEBEN ESTAR DENTRO DEL NAVHOST)
         composable("perfil_usuario") {
             ProfileScreen(navController)
@@ -80,6 +82,4 @@ fun AppNavGraph(navController: NavHostController) {
         }
     }
 }
-
-
 

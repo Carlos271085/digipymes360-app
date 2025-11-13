@@ -54,16 +54,17 @@ fun ProfileScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-    Image(
-        painter = painterResource(id = R.drawable.gato_naranja),
-        contentDescription = "Logo Pymes 360",
-        modifier = Modifier
-            .size(256.dp)
-            .clip(CircleShape)
-        //.align(Alignment.CenterHorizontally)
+            Spacer(modifier = Modifier.height(16.dp))
 
+            Image(
+                painter = painterResource(id = R.drawable.gato_naranja),
+                contentDescription = "Logo PYMES 360",
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+            )
 
-    )
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text("Usuario: ${DatosUsuario.nombre}", style = MaterialTheme.typography.bodyLarge)
             Text("Email: ${DatosUsuario.email}", style = MaterialTheme.typography.bodyLarge)
