@@ -117,9 +117,8 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
                 Spacer(Modifier.height(16.dp))
 
                 // --- TOTAL DE COMPRA ---
-                val total = carrito.sumOf {
-                    it.precio.replace("$", "").replace(".", "").toInt() * it.stock
-                }
+                val total = viewModel.totalCompra()
+
                 Text(
                     text = "Total: $$total",
                     style = MaterialTheme.typography.titleMedium,
