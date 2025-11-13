@@ -21,10 +21,11 @@ fun AppNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         //startDestination = "login"
-        startDestination = "home/$gson" // Test only
+
+        startDestination = "home" // Test only
+
     ) {
 
-        
         // LOGIN
         composable("login") {
             LoginScreen(navController)
@@ -37,32 +38,21 @@ fun AppNavGraph(navController: NavHostController) {
 
         // HOME
         composable(
-            route = "home/{userJson}",
-            arguments = listOf(navArgument("userJson") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val userJson = backStackEntry.arguments?.getString("userJson")
-            val usuario = Gson().fromJson(userJson, UsuarioDTO::class.java)
+            route = "home",
 
+        ) {
             HomeScreen(
                 navController = navController,
-                viewModel = carritoViewModel,
-                user = usuario.nombre ?: "Sin nombre",
-                email = usuario.email ?: "Sin email"
+                viewModel = carritoViewModel
             )
         }
 
         // PERFIL (desde JSON)
         composable(
-            route = "profile/{userJson}",
-            arguments = listOf(navArgument("userJson") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val userJson = backStackEntry.arguments?.getString("userJson")
-            val usuario = Gson().fromJson(userJson, UsuarioDTO::class.java)
-
+            route = "profile"
+        ) {
             ProfileScreen(
-                navController = navController,
-                user = usuario.nombre ?: "Sin nombre",
-                email = usuario.email ?: "Sin email"
+                navController
             )
         }
 
@@ -74,9 +64,10 @@ fun AppNavGraph(navController: NavHostController) {
         // COMPRA EXITOSA
         composable("compra_exitosa") { CompraExitosaScreen(navController) }
 
+
         // 🆕 NUEVAS RUTAS (DEBEN ESTAR DENTRO DEL NAVHOST)
         composable("perfil_usuario") {
-            ProfileScreen(navController, user = "Carlos", email = "carlos@pymes360.cl")
+            ProfileScreen(navController)
         }
 
         composable("historial_compras") {
@@ -86,5 +77,9 @@ fun AppNavGraph(navController: NavHostController) {
         composable("contacto") {
             ContactoScreen(navController)
         }
+        composable("compra_exitosa") {
+            CompraExitosaScreen(navController)
+        }
     }
 }
+
