@@ -71,7 +71,7 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logodigipymes),
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo Pymes 360",
                 modifier = Modifier
                     .size(110.dp)
