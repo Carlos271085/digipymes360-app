@@ -15,8 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.app.R
+import com.example.app.model.UsuarioDTO
 import com.example.app.ui.theme.* // ✅ importa tu paleta de colores
 import com.example.app.ui.login.LoginViewModel
+import com.example.app.util.DatosUsuario
 import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,8 +38,14 @@ fun LoginScreen(
     LaunchedEffect(loginResult) {
         if (loginResult != null) {
             loginResult?.let { usuario ->
+
                 val userJson = Uri.encode(Gson().toJson(usuario))
-                navController.navigate("home/$userJson") {
+                val usuario_json = Gson().fromJson(userJson, UsuarioDTO::class.java)
+
+                DatosUsuario.email = usuario_json.email
+                DatosUsuario.nombre = usuario_json.nombre
+
+                navController.navigate("home") {
                     popUpTo("login") { inclusive = true }
                 }
             }

@@ -15,4 +15,5 @@ class UsuarioRepository(private val api: ApiService) {
 
     suspend fun addUsuario(usuario: UsuarioRegistro, direccion:String,telefono:String): Usuario =
         api.addUsuario(usuario,direccion,telefono)
+
 }
