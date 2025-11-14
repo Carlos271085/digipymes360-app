@@ -67,6 +67,8 @@ dependencies {
         //Huella dactilar
         implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
+        implementation(libs.biometric)
+
         //Data Store
         implementation("androidx.datastore:datastore-preferences:1.1.1")
 
@@ -75,6 +77,12 @@ dependencies {
 
         //IMPORTAR MATERIAL DESIGN
         implementation("androidx.compose.material3:material3")
+
+        //Implementar servicio de locación
+        implementation("com.google.android.gms:play-services-location:21.3.0")
+
+        implementation(libs.play.services.location)
+
     }
 
 

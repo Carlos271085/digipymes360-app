@@ -6,6 +6,6 @@
         <domain includeSubdomains="true">98.95.22.3</domain>
 
 
-        
+
     </domain-config>
 </network-security-config>

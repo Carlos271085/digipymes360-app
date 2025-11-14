@@ -65,5 +65,3 @@ class CarritoViewModel : ViewModel() {
     fun totalCompra(): Int = _carrito.sumOf { it.precio.replace("$", "").replace(".", "").toInt() * it.stock }
 
 }
-
-
