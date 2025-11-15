@@ -17,12 +17,20 @@ import com.example.app.R
 import com.example.app.ui.theme.*
 import com.example.app.viewmodel.CarritoViewModel
 import android.widget.Toast
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import com.example.app.model.Producto;
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewModel) {
-    val carrito = viewModel.carrito
+fun CarroDeComprasScreen(
+    navController: NavController,
+    viewModel: CarritoViewModel
+) {
+
+    // --- OBSERVAR STATEFLOWS ---
+    val carrito by viewModel.carrito.collectAsState()
+    val totalProductos by viewModel.totalProductos.collectAsState()
 
     Scaffold(
         topBar = {
@@ -35,6 +43,7 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
             )
         }
     ) { pad ->
+
         Column(
             modifier = Modifier
                 .padding(pad)
@@ -43,8 +52,10 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
             verticalArrangement = Arrangement.Top
         ) {
 
+            // -------------------------
+            // CARRITO VACÍO
+            // -------------------------
             if (carrito.isEmpty()) {
-                // --- MENSAJE CUANDO EL CARRITO ESTÁ VACÍO ---
                 Text(
                     text = "Tu carrito está vacío",
                     style = MaterialTheme.typography.titleMedium,
@@ -55,25 +66,32 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
                     textAlign = TextAlign.Center
                 )
             } else {
-                // --- LISTADO DE PRODUCTOS EN EL CARRITO ---
+
+                // -------------------------
+                // LISTA DE PRODUCTOS
+                // -------------------------
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.weight(1f)
                 ) {
+
                     items(carrito) { producto ->
+
                         Card(
                             colors = CardDefaults.cardColors(containerColor = Color.White),
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
+
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(12.dp)
                             ) {
+
                                 Image(
-                                    painter = painterResource(id = producto.imagen),
+                                    painter = painterResource(id = R.drawable.pyme),
                                     contentDescription = producto.nombre,
                                     modifier = Modifier.size(80.dp)
                                 )
@@ -93,7 +111,6 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = OrangePrimary
                                     )
-                                    // --- MOSTRAR CANTIDAD ---
                                     Text(
                                         "Cantidad: ${producto.stock}",
                                         style = MaterialTheme.typography.bodySmall,
@@ -101,8 +118,10 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
                                     )
                                 }
 
-                                // --- BOTÓN PARA ELIMINAR ---
-                                IconButton(onClick = { viewModel.eliminarDelCarrito(producto) }) {
+                                // Botón eliminar
+                                IconButton(
+                                    onClick = { viewModel.eliminarDelCarrito(producto) }
+                                ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.eliminar_compra),
                                         contentDescription = "Eliminar producto",
@@ -116,7 +135,9 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
 
                 Spacer(Modifier.height(16.dp))
 
-                // --- TOTAL DE COMPRA ---
+                // -------------------------
+                // TOTAL DE COMPRA
+                // -------------------------
                 val total = viewModel.totalCompra()
 
                 Text(
@@ -126,18 +147,29 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                // --- BOTÓN PARA COMPRAR CARRITO ---
+                // -------------------------
+                // COMPRAR
                 val context = LocalContext.current
+
                 Button(
                     onClick = {
                         val comprado = viewModel.comprarCarrito()
                         if (comprado) {
-                            Toast.makeText(context, "¡Compra realizada con éxito!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "¡Compra realizada con éxito!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
                             navController.navigate("compra_exitosa") {
                                 popUpTo("carro_compras") { inclusive = true }
                             }
                         } else {
-                            Toast.makeText(context, "El carrito está vacío", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "El carrito está vacío",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = OrangePrimary),
@@ -146,10 +178,11 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
                     Text("Comprar ahora", color = Color.White)
                 }
 
-
                 Spacer(Modifier.height(16.dp))
 
-                // --- BOTÓN PARA VACIAR CARRITO ---
+                // -------------------------
+                // VACIAR CARRITO
+                // -------------------------
                 Button(
                     onClick = { viewModel.vaciarCarrito() },
                     colors = ButtonDefaults.buttonColors(containerColor = RedError),
@@ -160,7 +193,9 @@ fun CarroDeComprasScreen(navController: NavController, viewModel: CarritoViewMod
 
                 Spacer(Modifier.height(8.dp))
 
-                // --- BOTÓN PARA VOLVER AL HOME ---
+                // -------------------------
+                // VOLVER AL HOME
+                // -------------------------
                 OutlinedButton(
                     onClick = { navController.navigate("home") },
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = BlueDark),

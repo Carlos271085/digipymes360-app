@@ -1,11 +1,8 @@
 package com.example.app.view
 
-
-import com.example.app.ui.screens.BiometricScreen
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
-
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,19 +11,21 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.app.viewmodel.CarritoViewModel
 import com.example.app.model.UsuarioDTO
+import com.example.app.viewmodel.ProductoViewModel
 import com.google.gson.Gson
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
 
     val carritoViewModel: CarritoViewModel = viewModel()
+    val productoViewModel: ProductoViewModel = viewModel()
 
     val gson = Gson().toJson(UsuarioDTO(0, "Usuario de Prueba", "email@mail.com", "0"))
 
     NavHost(
         navController = navController,
         //startDestination = "login"
-        //startDestination = "home/$gson" // Test only
+        //startDestination = "home" // Test only
         startDestination = "biometric_test"
 
     ) {
@@ -48,7 +47,9 @@ fun AppNavGraph(navController: NavHostController) {
         ) {
             HomeScreen(
                 navController = navController,
-                viewModel = carritoViewModel
+                carritoViewModel = carritoViewModel,
+                productoViewModel = productoViewModel
+
             )
         }
 
@@ -83,7 +84,7 @@ fun AppNavGraph(navController: NavHostController) {
         composable("biometric_test") {
             val context = LocalContext.current
             val activity = context as FragmentActivity
-            com.example.app.ui.screens.BiometricScreen(activity)
+            com.example.app.ui.screens.BiometricScreen(activity,navController)
         }
 
         composable("contacto") {

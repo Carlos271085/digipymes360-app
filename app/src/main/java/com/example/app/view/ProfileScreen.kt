@@ -16,11 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import com.example.app.R
+import com.example.app.util.DatosUsuario
 import com.example.app.util.getUserAddress
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController, user: String, email: String) {
+fun ProfileScreen(navController: NavController) {
 
     // Variables de estado para manejar dirección y errores
     val context = LocalContext.current
@@ -67,8 +69,8 @@ fun ProfileScreen(navController: NavController, user: String, email: String) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Información de usuario
-            Text("Usuario: $user", style = MaterialTheme.typography.bodyLarge)
-            Text("Email: $email", style = MaterialTheme.typography.bodyLarge)
+            Text("Usuario: ${DatosUsuario.nombre}", style = MaterialTheme.typography.bodyLarge)
+            Text("Email: ${DatosUsuario.email}", style = MaterialTheme.typography.bodyLarge)
 
             Spacer(modifier = Modifier.height(24.dp))
 

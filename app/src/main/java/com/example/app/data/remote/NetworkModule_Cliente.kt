@@ -6,10 +6,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-object NetworkModule {
-    //private const val BASE_URL = "http://98.90.175.159:8080/"//Carlos
-    private const val BASE_URL = "http://35.173.75.94:8080/"//Eduardo
-    //private const val BASE_URL = "http://98.95.22.3:8080/"//Karina
+object NetworkModule_Cliente {
+    //private const val BASE_URL = "http://98.90.175.159:8082/"//Carlos
+    private const val BASE_URL = "http://35.173.75.94:8082/"//Eduardo
+    //private const val BASE_URL = "http://98.95.22.3:8082/"//Karina
 
 
     private val logging = HttpLoggingInterceptor().apply {
@@ -28,5 +28,5 @@ object NetworkModule {
         .client(client)
         .build()
 
-    val api: ApiService = retrofit.create(ApiService::class.java)
+    val api: ApiService_Cliente = retrofit.create(ApiService_Cliente::class.java)
 }

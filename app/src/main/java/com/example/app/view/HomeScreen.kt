@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,18 +26,27 @@ import com.example.app.R
 import com.example.app.model.Producto
 import com.example.app.ui.theme.*
 import com.example.app.viewmodel.CarritoViewModel
+import com.example.app.viewmodel.ProductoViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
+fun HomeScreen(
+    navController: NavController,
+    carritoViewModel: CarritoViewModel,
+    productoViewModel: ProductoViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
 
+    // --- ESTADOS ---
     var searchQuery by remember { mutableStateOf("") }
     var searchActive by remember { mutableStateOf(false) }
 
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    // IMPORTANTE: usamos collectAsState(initial = ...) para evitar ambigüedad de tipo
+    val productos: List<Producto> by productoViewModel.productos.collectAsState(initial = emptyList())
+    val loading: Boolean by productoViewModel.loading.collectAsState(initial = false)
+    val error: String? by productoViewModel.error.collectAsState(initial = null)
 
-    // --- ESTADO DEL MENÚ (Drawer) ---
+    // --- MENU LATERAL ---
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -47,7 +57,6 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
         "Contacto" to Icons.Default.Info
     )
 
-    // --- MENU LATERAL ---
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -74,9 +83,7 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                                 "Historial de Compras" -> navController.navigate("historial_compras")
                                 "Contacto" -> navController.navigate("contacto")
                             }
-                            scope.launch {
-                                drawerState.close()
-                            }
+                            scope.launch { drawerState.close() }
                         },
                         icon = { Icon(icono, contentDescription = titulo) },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -101,20 +108,18 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                         titleContentColor = Color.White
                     ),
                     actions = {
-                        val totalProductos = viewModel.totalProductos.value
+                        val totalProductos by carritoViewModel.totalProductos.collectAsState(initial = 0)
                         BadgedBox(
                             badge = {
                                 if (totalProductos > 0) {
-                                    Badge {
-                                        Text("$totalProductos")
-                                    }
+                                    Badge { Text("$totalProductos") }
                                 }
                             }
                         ) {
                             IconButton(onClick = { navController.navigate("carro_compras") }) {
                                 Icon(
                                     imageVector = Icons.Default.ShoppingCart,
-                                    contentDescription = "Carrito de compras",
+                                    contentDescription = "Carrito",
                                     tint = Color.White
                                 )
                             }
@@ -123,6 +128,7 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                 )
             }
         ) { innerPadding ->
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -130,7 +136,7 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                     .padding(8.dp)
             ) {
 
-                // --- BARRA DE BÚSQUEDA ---
+                // --- SEARCH BAR ---
                 DockedSearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it },
@@ -144,9 +150,9 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                         .padding(16.dp)
                 ) {}
 
-                // --- RESEÑA DE LA PÁGINA ---
+                // --- DESCRIPCIÓN ---
                 Text(
-                    text = "Bienvenido a PYMES 360, tu marketplace digital para emprendedores y pequeños negocios...",
+                    text = "Bienvenido a PYMES 360, tu marketplace digital para emprendedores...",
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary,
                     modifier = Modifier
@@ -154,32 +160,45 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                     textAlign = TextAlign.Center
                 )
 
+                // --- LOADING ---
+                if (loading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = OrangePrimary)
+                    }
+                }
+
+                // --- ERROR ---
+                error?.let {
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
                 // --- LISTA DE PRODUCTOS ---
-                val productos = listOf(
-                    Producto(1, 101, 12, "Audífonos Bluetooth", "$14.990", R.drawable.audifono, "Audífonos inalámbricos..."),
-                    Producto(2, 102, 8, "Smartwatch Deportivo", "$25.990", R.drawable.reloj, "Reloj inteligente..."),
-                    Producto(3, 103, 10, "Parlante Portátil", "$19.990", R.drawable.microfono, "Parlante Bluetooth..."),
-                    Producto(4, 104, 15, "Teclado Mecánico RGB", "$29.990", R.drawable.teclado, "Teclado mecánico..."),
-                    Producto(5, 105, 20, "Mouse Gamer RGB", "$17.990", R.drawable.mouse, "Mouse óptico gamer..."),
-                    Producto(6, 106, 9, "Cámara Web HD 1080p", "$22.990", R.drawable.camara, "Cámara Full HD...")
-                )
+                val listaFiltrada = productos.filter {
+                    it.nombre.contains(searchQuery, ignoreCase = true)
+                }
 
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 160.dp),
                     contentPadding = PaddingValues(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    val listaFiltrada = productos.filter {
-                        it.nombre.contains(searchQuery, ignoreCase = true)
-                    }
-
                     items(listaFiltrada) { producto ->
                         Card(
                             modifier = Modifier
                                 .height(260.dp)
                                 .clickable { /* futuro detalle */ },
-                            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                             colors = CardDefaults.cardColors(containerColor = Color.White),
                             shape = MaterialTheme.shapes.large
                         ) {
@@ -191,25 +210,31 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Image(
-                                    painter = painterResource(id = producto.imagen),
+                                    painter = painterResource(id = R.drawable.pyme),
                                     contentDescription = producto.nombre,
                                     modifier = Modifier.size(100.dp)
                                 )
                                 Spacer(Modifier.height(8.dp))
+
                                 Text(
                                     producto.nombre,
                                     style = MaterialTheme.typography.titleMedium,
                                     color = TextPrimary,
                                     textAlign = TextAlign.Center
                                 )
+
+                                Spacer(Modifier.height(4.dp))
+
                                 Text(
                                     producto.precio,
                                     color = OrangePrimary,
                                     style = MaterialTheme.typography.labelLarge
                                 )
+
                                 Spacer(Modifier.height(8.dp))
+
                                 Button(
-                                    onClick = { viewModel.agregarAlCarrito(producto) },
+                                    onClick = { carritoViewModel.agregarAlCarrito(producto) },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = OrangePrimary,
                                         contentColor = Color.White
@@ -219,8 +244,7 @@ fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.agregar_producto),
                                         contentDescription = "Agregar al carrito",
-                                        modifier = Modifier.size(24.dp),
-                                        tint = Color.White
+                                        modifier = Modifier.size(24.dp)
                                     )
                                 }
                             }
