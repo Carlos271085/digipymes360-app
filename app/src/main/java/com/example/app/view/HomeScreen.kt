@@ -53,7 +53,6 @@ fun HomeScreen(
     val menuItems = listOf(
         "Perfil del Usuario" to Icons.Default.Person,
         "Listado de Productos" to Icons.Default.Search,
-        "Historial de Compras" to Icons.Default.ShoppingCart,
         "Contacto" to Icons.Default.Info
     )
 
@@ -80,7 +79,6 @@ fun HomeScreen(
                             when (titulo) {
                                 "Perfil del Usuario" -> navController.navigate("perfil_usuario")
                                 "Listado de Productos" -> navController.navigate("home")
-                                "Historial de Compras" -> navController.navigate("historial_compras")
                                 "Contacto" -> navController.navigate("contacto")
                             }
                             scope.launch { drawerState.close() }
