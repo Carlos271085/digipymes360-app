@@ -14,9 +14,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import java.util.concurrent.Executor
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.NavController
 
 @Composable
-fun BiometricScreen(activity: FragmentActivity) {
+fun BiometricScreen(
+    activity: FragmentActivity,
+    navController: NavController
+) {
     val context = LocalContext.current
     val executor: Executor = ContextCompat.getMainExecutor(context)
     var message by remember { mutableStateOf("Presiona el botón para autenticarte") }
@@ -30,10 +34,16 @@ fun BiometricScreen(activity: FragmentActivity) {
     val biometricPrompt = remember {
         BiometricPrompt(activity, executor,
             object : BiometricPrompt.AuthenticationCallback() {
+
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
-                    message = "✅ Autenticación exitosa"
-                    Toast.makeText(context, "Bienvenido", Toast.LENGTH_SHORT).show()
+                    message = "Autenticación exitosa"
+                    Toast.makeText(context, "Bienvenido(a)", Toast.LENGTH_SHORT).show()
+
+                    // ⭐️ NAVEGAR A LOGIN
+                    navController.navigate("login") {
+                        popUpTo("biometric") { inclusive = true }
+                    }
                 }
 
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
@@ -43,14 +53,15 @@ fun BiometricScreen(activity: FragmentActivity) {
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-                    message = "❌ Huella no reconocida"
+                    message = "Huella no reconocida"
                 }
             })
     }
 
     val biometricManager = BiometricManager.from(context)
-    val isAvailable = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) ==
-            BiometricManager.BIOMETRIC_SUCCESS
+    val isAvailable =
+        biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) ==
+                BiometricManager.BIOMETRIC_SUCCESS
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -70,8 +81,7 @@ fun BiometricScreen(activity: FragmentActivity) {
                     } else {
                         Toast.makeText(context, "Biometría no disponible o no configurada", Toast.LENGTH_SHORT).show()
                     }
-                },
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+                }
             ) {
                 Text("Ingresar con huella")
             }
