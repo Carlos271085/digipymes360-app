@@ -65,28 +65,20 @@ dependencies {
     // Coil
     implementation("io.coil-kt:coil-compose:2.7.0")
 
-<<<<<<< Updated upstream
-        //Data Store
-        implementation("androidx.datastore:datastore-preferences:1.1.1")
-=======
     // Huella
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
->>>>>>> Stashed changes
+
 
     // Icons
     implementation("androidx.compose.material:material-icons-extended")
 
-<<<<<<< Updated upstream
-        //IMPORTAR MATERIAL DESIGN
-        implementation("androidx.compose.material3:material3")
-    }
-=======
+
     // Location
     implementation("com.google.android.gms:play-services-location:21.3.0")
->>>>>>> Stashed changes
+
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
