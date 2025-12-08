@@ -16,11 +16,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.app.R
+import com.example.app.model.Usuario
 import com.example.app.model.UsuarioDTO
+import com.example.app.model.UsuarioLogin
 import com.example.app.ui.theme.* // ✅ importa tu paleta de colores
 import com.example.app.ui.login.LoginViewModel
 import com.example.app.util.DatosUsuario
 import com.google.gson.Gson
+
+fun esJsonValido(text: String): Boolean {
+    val t = text.trim()
+    return t.startsWith("{") && t.endsWith("}")
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,21 +45,23 @@ fun LoginScreen(
 
 
     LaunchedEffect(loginResult) {
-        if (loginResult != null) {
-            loginResult?.let { usuario ->
+        val usuario = loginResult ?: return@LaunchedEffect
 
-                val userJson = Uri.encode(Gson().toJson(usuario))
-                val usuario_json = Gson().fromJson(userJson, UsuarioDTO::class.java)
+        // Si quieres guardar el JSON REAL
+        val userJson = Gson().toJson(usuario)
 
-                DatosUsuario.email = usuario_json.email
-                DatosUsuario.nombre = usuario_json.nombre
+        if (esJsonValido(userJson)) {
+            DatosUsuario.email = usuario.email
+            DatosUsuario.nombre = usuario.nombre
 
-                navController.navigate("home") {
-                    popUpTo("login") { inclusive = true }
-                }
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
             }
+        } else {
+            Toast.makeText(context, "Respuesta inválida del servidor", Toast.LENGTH_LONG).show()
         }
     }
+
 
 
     LaunchedEffect(error) {

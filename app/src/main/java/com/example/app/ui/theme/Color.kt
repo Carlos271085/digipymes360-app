@@ -11,4 +11,3 @@ val DarkBackground = Color(0xFF1E1E1E)  // Fondo oscuro
 val TextPrimary = Color(0xFF333333)     // Texto principal
 val TextSecondary = Color(0xFF7F8C8D)   // Texto secundario
 val BlueInfo = Color(0xFF3498DB)        // Azul información
-

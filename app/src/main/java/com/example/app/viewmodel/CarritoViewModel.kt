@@ -1,69 +1,86 @@
 package com.example.app.viewmodel
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.app.model.Producto
-
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class CarritoViewModel : ViewModel() {
 
-    private val _carrito = mutableStateListOf<Producto>()
-    val carrito: List<Producto> get() = _carrito
+    // --- LISTA DE PRODUCTOS COMO STATEFLOW ---
+    private val _carrito = MutableStateFlow<List<Producto>>(emptyList())
+    val carrito: StateFlow<List<Producto>> = _carrito.asStateFlow()
 
-    // --- CONTADOR OBSERVABLE ---
-    var totalProductos = mutableStateOf(0)
-        private set
+    // --- CONTADOR TOTAL ---
+    private val _totalProductos = MutableStateFlow(0)
+    val totalProductos: StateFlow<Int> = _totalProductos.asStateFlow()
 
+    // --- AGREGAR PRODUCTO ---
     fun agregarAlCarrito(producto: Producto) {
-        // Buscar si el producto ya está en el carrito
-        val existente = _carrito.find { it.id == producto.id }
+        val listaActual = _carrito.value.toMutableList()
+        val existente = listaActual.find { it.id == producto.id }
 
         if (existente != null) {
-            // Aumentar cantidad (usamos stock como cantidad en carrito)
-            existente.stock += 1
+            val actualizado = existente.copy(stock = existente.stock + 1)
+            listaActual[listaActual.indexOf(existente)] = actualizado
         } else {
-            // Agregar nuevo producto con cantidad = 1
-            val nuevo = producto.copy(stock = 1)
-            _carrito.add(nuevo)
+            listaActual.add(producto.copy(stock = 1))
         }
 
-        // 🔁 Actualizar contador reactivo
-        totalProductos.value = _carrito.sumOf { it.stock }
+        _carrito.value = listaActual
+        actualizarTotal()
     }
 
+    // --- ELIMINAR PRODUCTO ---
     fun eliminarDelCarrito(producto: Producto) {
-        val existente = _carrito.find { it.id == producto.id }
+        val listaActual = _carrito.value.toMutableList()
+        val existente = listaActual.find { it.id == producto.id }
 
         if (existente != null) {
             if (existente.stock > 1) {
-                existente.stock -= 1
+                val actualizado = existente.copy(stock = existente.stock - 1)
+                listaActual[listaActual.indexOf(existente)] = actualizado
             } else {
-                _carrito.remove(existente)
+                listaActual.remove(existente)
             }
         }
 
-        // 🔁 Actualizar contador reactivo
-        totalProductos.value = _carrito.sumOf { it.stock }
+        _carrito.value = listaActual
+        actualizarTotal()
     }
 
+    // --- VACIAR CARRITO ---
     fun vaciarCarrito() {
-        _carrito.clear()
-        totalProductos.value = 0
+        _carrito.value = emptyList()
+        _totalProductos.value = 0
     }
 
+    // --- COMPRAR ---
     fun comprarCarrito(): Boolean {
-        return if (_carrito.isNotEmpty()) {
-            _carrito.clear()
-            totalProductos.value = 0
+        return if (_carrito.value.isNotEmpty()) {
+            _carrito.value = emptyList()
+            _totalProductos.value = 0
             true
         } else {
             false
         }
     }
 
-    fun totalCompra(): Int = _carrito.sumOf { it.precio.replace("$", "").replace(".", "").toInt() * it.stock }
+    // --- TOTAL COMPRA ---
+    fun totalCompra(): Double =
+        _carrito.value.sumOf { producto ->
+            producto.precio
+                .replace("$", "")
+                .replace(" ", "")
+                // Quitar solo comas de miles (si existen)
+                .replace(",", "")
+                .toDouble() * producto.stock
+        }
 
+
+    // --- ACTUALIZAR CONTADOR ---
+    private fun actualizarTotal() {
+        _totalProductos.value = _carrito.value.sumOf { it.stock }
+    }
 }
-
-

@@ -83,7 +83,7 @@ fun RegisterScreen(
 
             // --- LOGO ---
             Image(
-                painter = painterResource(id = R.drawable.logodigipymes),
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo PYMES 360",
                 modifier = Modifier
                     .size(150.dp)
@@ -251,7 +251,3 @@ fun saveUserData(context: Context, usuario: Usuario) {
 
 
 }
-
-
-
-

@@ -1,16 +1,11 @@
 [versions]
-androidGradlePlugin = "8.5.0"
-kotlin = "1.9.23"
-composeCompiler = "1.5.15"
-kapt = "1.9.23" # Add this - Match your Kotlin version
-hilt = "2.51.1" # Add this
-
-[libraries]
-androidx-compose-compiler = { group = "androidx.compose.compiler", name = "compiler", version.ref = "composeCompiler" }
+androidGradlePlugin = "8.2.0"  # Use a recent version
+kotlin = "1.9.22"              # Use a recent version
+hilt = "2.50"                  # Use a recent version
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt" } # Add this
-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" } # Add this
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

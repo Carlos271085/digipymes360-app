@@ -71,19 +71,17 @@ dependencies {
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-
     // Icons
     implementation("androidx.compose.material:material-icons-extended")
 
-
-    // Location
+    //IMPORTAR MATERIAL DESIGN
+    implementation("androidx.compose.material3:material3")
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
-
-    // Hilt
+        // Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-compiler:2.51.1")
 
-    // Compose + Hilt
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+// Compose + Hilt
+implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 }

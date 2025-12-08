@@ -1,12 +1,9 @@
 package com.example.app.view
 
 import androidx.compose.runtime.Composable
-<<<<<<< Updated upstream
-=======
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
->>>>>>> Stashed changes
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,84 +11,124 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.app.viewmodel.CarritoViewModel
-import com.example.app.model.UsuarioDTO
+import com.example.app.viewmodel.ProductoViewModel
 import com.google.gson.Gson
+import com.example.app.model.UsuarioDTO
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
 
-<<<<<<< Updated upstream
-    val carritoViewModel: CarritoViewModel = viewModel()
-=======
     // ViewModels compartidos
     val carritoViewModel: CarritoViewModel = hiltViewModel()
     val productoViewModel: ProductoViewModel = hiltViewModel()
->>>>>>> Stashed changes
 
+    // Ejemplo de usuario (luego lo conectas a tu login real)
     val gson = Gson().toJson(UsuarioDTO(0, "Usuario de Prueba", "email@mail.com", "0"))
 
     NavHost(
         navController = navController,
+        startDestination = "biometric_test"
         //startDestination = "login"
-
-        startDestination = "home" // Test only
-
+        //startDestination = "home"
     ) {
 
+        // ---------------------------
         // LOGIN
+        // ---------------------------
         composable("login") {
             LoginScreen(navController)
         }
 
+        // ---------------------------
         // REGISTRO
+        // ---------------------------
         composable("register") {
             RegisterScreen(navController)
         }
 
+        // ---------------------------
         // HOME
-        composable(
-            route = "home",
-
-        ) {
+        // ---------------------------
+        composable("home") {
             HomeScreen(
                 navController = navController,
-                viewModel = carritoViewModel
+                carritoViewModel = carritoViewModel,
+                productoViewModel = productoViewModel
             )
         }
 
-        // PERFIL (desde JSON)
-        composable(
-            route = "profile"
-        ) {
-            ProfileScreen(
-                navController
-            )
+        // ---------------------------
+        // PERFIL
+        // ---------------------------
+        composable("profile") {
+            ProfileScreen(navController)
         }
 
+        // ---------------------------
         // CARRITO DE COMPRAS
+        // ---------------------------
         composable("carro_compras") {
             CarroDeComprasScreen(navController, carritoViewModel)
         }
 
+        // ---------------------------
         // COMPRA EXITOSA
-        composable("compra_exitosa") { CompraExitosaScreen(navController) }
+        // ---------------------------
+        composable("compra_exitosa") {
+            CompraExitosaScreen(navController)
+        }
 
-
-        // 🆕 NUEVAS RUTAS (DEBEN ESTAR DENTRO DEL NAVHOST)
+        // ---------------------------
+        // PERFIL (RUTA EXTRA)
+        // ---------------------------
         composable("perfil_usuario") {
             ProfileScreen(navController)
         }
 
+        // ---------------------------
+        // HISTORIAL DE COMPRAS
+        // ---------------------------
         composable("historial_compras") {
             HistorialComprasScreen(navController)
         }
 
+        // ---------------------------
+        // BIOMETRÍA (PRUEBA)
+        // ---------------------------
+        composable("biometric_test") {
+            val context = LocalContext.current
+            val activity = context as FragmentActivity
+            com.example.app.ui.screens.BiometricScreen(activity, navController)
+        }
+
+        // ---------------------------
+        // CONTACTO
+        // ---------------------------
         composable("contacto") {
             ContactoScreen(navController)
         }
-        composable("compra_exitosa") {
-            CompraExitosaScreen(navController)
+
+        // =======================================================
+        //  PASARELA DE PAGO — RUTA NUEVA
+        // =======================================================
+        composable(
+            route = "pago/{monto}",
+            arguments = listOf(
+                navArgument("monto") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val monto = backStackEntry.arguments
+                ?.getString("monto")
+                ?.toDoubleOrNull() ?: 0.0
+
+            PagoScreen(
+                navController = navController,
+                usuarioId = 1L, // LUEGO LO CONECTAMOS AL LOGIN REAL
+                monto = monto
+            )
         }
     }
 }
+
 

@@ -1,5 +1,3 @@
-// File: settings.gradle.kts
-
 pluginManagement {
     repositories {
         google()
@@ -15,5 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "digipymes360-app"
-include(":app") // This line is crucial
+rootProject.name = "App"
+include(":app")
+ 

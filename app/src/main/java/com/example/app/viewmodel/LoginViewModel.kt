@@ -7,11 +7,10 @@ import com.example.app.data.repository.UsuarioRepository
 import com.example.app.model.Usuario
 import com.example.app.model.UsuarioDTO
 import com.example.app.model.UsuarioRegistro
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel

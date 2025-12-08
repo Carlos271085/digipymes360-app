@@ -7,6 +7,5 @@
         <domain includeSubdomains="true">75.101.154.169</domain>
 
 
-        
     </domain-config>
 </network-security-config>

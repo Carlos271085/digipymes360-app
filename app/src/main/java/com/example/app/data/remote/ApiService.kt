@@ -24,4 +24,5 @@ interface ApiService {
         @Query("direccion") direccion: String,
         @Query("telefono") telefono: String
     ): Usuario
+
 }
