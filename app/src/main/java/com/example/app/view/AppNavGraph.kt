@@ -1,6 +1,12 @@
 package com.example.app.view
 
 import androidx.compose.runtime.Composable
+<<<<<<< Updated upstream
+=======
+import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.FragmentActivity
+import androidx.hilt.navigation.compose.hiltViewModel
+>>>>>>> Stashed changes
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,7 +20,13 @@ import com.google.gson.Gson
 @Composable
 fun AppNavGraph(navController: NavHostController) {
 
+<<<<<<< Updated upstream
     val carritoViewModel: CarritoViewModel = viewModel()
+=======
+    // ViewModels compartidos
+    val carritoViewModel: CarritoViewModel = hiltViewModel()
+    val productoViewModel: ProductoViewModel = hiltViewModel()
+>>>>>>> Stashed changes
 
     val gson = Gson().toJson(UsuarioDTO(0, "Usuario de Prueba", "email@mail.com", "0"))
 

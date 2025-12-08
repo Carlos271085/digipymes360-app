@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.app.R
 import com.example.app.model.Producto
@@ -29,7 +30,15 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+<<<<<<< Updated upstream
 fun HomeScreen(navController: NavController, viewModel: CarritoViewModel) {
+=======
+fun HomeScreen(
+    navController: NavController,
+    carritoViewModel: CarritoViewModel,
+    productoViewModel: ProductoViewModel = hiltViewModel()
+) {
+>>>>>>> Stashed changes
 
     var searchQuery by remember { mutableStateOf("") }
     var searchActive by remember { mutableStateOf(false) }

@@ -1,4 +1,5 @@
 [versions]
+<<<<<<< Updated upstream
 agp = "8.13.0"
 kotlin = "2.0.21"
 coreKtx = "1.17.0"
@@ -30,3 +31,20 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
+=======
+androidGradlePlugin = "8.5.0"
+kotlin = "1.9.23"
+composeCompiler = "1.5.15"
+kapt = "1.9.23" # Add this - Match your Kotlin version
+hilt = "2.51.1" # Add this
+
+[libraries]
+androidx-compose-compiler = { group = "androidx.compose.compiler", name = "compiler", version.ref = "composeCompiler" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt" } # Add this
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" } # Add this
+>>>>>>> Stashed changes

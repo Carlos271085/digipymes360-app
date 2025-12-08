@@ -10,8 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.app.ui.theme.AppTheme
 import com.example.app.view.AppNavGraph
+import dagger.hilt.android.AndroidEntryPoint
 
+<<<<<<< Updated upstream
 class MainActivity : ComponentActivity() {
+=======
+@AndroidEntryPoint
+class MainActivity : FragmentActivity() {
+>>>>>>> Stashed changes
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

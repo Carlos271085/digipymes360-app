@@ -8,10 +8,15 @@ import java.util.concurrent.TimeUnit
 
 object NetworkModule {
 
+<<<<<<< Updated upstream
     //private const val BASE_URL = "http://35.173.75.94:8082/"
     //private const val BASE_URL = "http://98.90.175.159:8080/"//Carlos
     private const val BASE_URL = "http://35.173.75.94:8080/"//Eduardo
     //private const val BASE_URL = "http://98.95.22.3:8080/"//Karina
+=======
+    //private const val BASE_URL = "http://35.171.13.254:8080/"//Gary
+    private const val BASE_URL = "http://75.101.154.169:8080/"//Eduardo
+>>>>>>> Stashed changes
 
 
     private val logging = HttpLoggingInterceptor().apply {
