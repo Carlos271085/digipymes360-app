@@ -7,13 +7,18 @@ import com.example.app.data.repository.UsuarioRepository
 import com.example.app.model.Usuario
 import com.example.app.model.UsuarioDTO
 import com.example.app.model.UsuarioRegistro
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val repository: UsuarioRepository // Inject the repository here
+) : ViewModel() {
 
-    private val repository = UsuarioRepository(NetworkModule.api)
+    //private val repository = UsuarioRepository(NetworkModule.api)
 
     private val _loginResult = MutableStateFlow<UsuarioDTO?>(null)
     val loginResult: StateFlow<UsuarioDTO?> = _loginResult

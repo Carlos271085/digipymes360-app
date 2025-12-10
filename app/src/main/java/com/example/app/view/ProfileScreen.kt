@@ -74,29 +74,7 @@ fun ProfileScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botón para obtener ubicación actual
-            Button(onClick = {
-                if (ActivityCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    getUserAddress(
-                        context = context,
-                        onSuccess = { direccionObtenida ->
-                            direccion = direccionObtenida
-                            mensajeError = null
-                        },
-                        onError = { error ->
-                            mensajeError = error
-                        }
-                    )
-                } else {
-                    mensajeError = "Debes otorgar permisos de ubicación"
-                }
-            }) {
-                Text("Obtener dirección actual")
-            }
+
 
             Spacer(modifier = Modifier.height(16.dp))
 

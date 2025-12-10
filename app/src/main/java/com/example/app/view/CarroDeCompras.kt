@@ -20,7 +20,7 @@ import android.widget.Toast
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import com.example.app.model.Producto;
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarroDeComprasScreen(
@@ -28,7 +28,7 @@ fun CarroDeComprasScreen(
     viewModel: CarritoViewModel
 ) {
 
-    // --- OBSERVAR STATEFLOWS ---
+    // Observamos los StateFlow del ViewModel
     val carrito by viewModel.carrito.collectAsState()
     val totalProductos by viewModel.totalProductos.collectAsState()
 
@@ -147,10 +147,30 @@ fun CarroDeComprasScreen(
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                // -------------------------
-                // COMPRAR
                 val context = LocalContext.current
 
+                // -------------------------
+                // PROCEDER AL PAGO (NUEVO)
+                // -------------------------
+                Button(
+                    onClick = {
+                        if (carrito.isNotEmpty()) {
+                            navController.navigate("pago/$total")
+                        } else {
+                            Toast.makeText(context, "El carrito está vacío", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = BlueDark),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Proceder al pago", color = Color.White)
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                // -------------------------
+                // COMPRAR SIN PASARELA (LÓGICA ANTIGUA)
+                // -------------------------
                 Button(
                     onClick = {
                         val comprado = viewModel.comprarCarrito()
@@ -207,3 +227,4 @@ fun CarroDeComprasScreen(
         }
     }
 }
+

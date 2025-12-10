@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.app.R
 import com.example.app.model.Producto
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     navController: NavController,
     carritoViewModel: CarritoViewModel,
-    productoViewModel: ProductoViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    productoViewModel: ProductoViewModel = hiltViewModel()
 ) {
 
     // --- ESTADOS ---

@@ -1,6 +1,8 @@
 package com.example.app.view
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.Image
@@ -14,12 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.app.ActivityCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.app.R
 import com.example.app.model.Usuario
 import com.example.app.model.UsuarioRegistro
 import com.example.app.ui.login.LoginViewModel
+import com.example.app.util.getUserAddress
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -28,7 +32,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
 
@@ -38,7 +42,7 @@ fun RegisterScreen(
     var password by remember { mutableStateOf("") }
     var direccion by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
-
+    var mensajeError by remember { mutableStateOf<String?>(null) }
     // --- Snackbar setup ---
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -82,7 +86,7 @@ fun RegisterScreen(
 
             // --- LOGO ---
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.logo2),
                 contentDescription = "Logo PYMES 360",
                 modifier = Modifier
                     .size(150.dp)
@@ -133,6 +137,29 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Botón para obtener ubicación actual
+            Button(onClick = {
+                if (ActivityCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    getUserAddress(
+                        context = context,
+                        onSuccess = { direccionObtenida ->
+                            direccion = direccionObtenida
+                            mensajeError = null
+                        },
+                        onError = { error ->
+                            mensajeError = error
+                        }
+                    )
+                } else {
+                    mensajeError = "Debes otorgar permisos de ubicación"
+                }
+            }) {
+                Text("Obtener dirección actual")
+            }
             Spacer(Modifier.height(12.dp))
 
             // --- TELÉFONO con prefijo fijo +56 9 ---
