@@ -2,39 +2,66 @@ package com.example.app.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.app.model.PaymentItemDTO
+import com.example.app.model.PaymentRequestDTO
+import com.example.app.data.repository.PagoRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import javax.inject.Inject
 
-class PagoViewModel : ViewModel() {
+@HiltViewModel
+class PagoViewModel @Inject constructor(
+    private val pagoRepository: PagoRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PagoUiState())
     val uiState: StateFlow<PagoUiState> = _uiState
 
-    // Ejemplo simple de cómo setear la URL (en tu caso llamarás repository)
     fun pagar(monto: Double, descripcion: String, usuarioId: Long) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+
+            _uiState.value = _uiState.value.copy(isLoading = true, mensaje = null)
 
             try {
-                // Llamar a repository para crear preferencia y obtener initPoint
-                // val response = repository.crearPreferencia(...)
-                // val initPoint = response.initPoint
+                // Crear item esperado por backend
+                val item = PaymentItemDTO(
+                    title = descripcion,
+                    quantity = 1,
+                    unitPrice = BigDecimal(monto)
+                )
 
-                // Simulamos resultado:
-                val initPoint = "https://www.mercadopago.cl/checkout/v1/redirect?pref_id=TEST123"
+                // crear request completo
+                val request = PaymentRequestDTO(
+                    items = listOf(item),
+                    usuarioId = usuarioId
+                )
 
-                _uiState.value = PagoUiState(
+                // llamar a backend
+                val response = pagoRepository.crearPreferencia(request)
+
+                // usar init_point o sandbox_init_point
+                val url = response.init_point ?: response.sandbox_init_point
+
+                if (url == null) {
+                    throw Exception("El backend no devolvió ninguna URL válida (init_point ni sandbox_init_point)")
+                }
+
+                _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     exito = true,
-                    urlWebPay = initPoint,
-                    mensaje = "Preferencia creada"
+                    urlWebPay = url,
+                    mensaje = "Preferencia creada con éxito"
                 )
+
             } catch (e: Exception) {
-                _uiState.value = PagoUiState(
+
+                _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     exito = false,
-                    mensaje = "Error: ${e.message}"
+                    mensaje = "Error al generar pago: ${e.localizedMessage}"
                 )
             }
         }

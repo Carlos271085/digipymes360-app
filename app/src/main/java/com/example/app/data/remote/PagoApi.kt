@@ -7,7 +7,7 @@ import retrofit2.http.POST
 
 interface PagoApi {
 
-    @POST("api/pago/preference")
+    @POST("api/pago/preferencia")
     suspend fun crearPreference(
         @Body request: PaymentRequestDTO
     ): PreferenceResponseDTO

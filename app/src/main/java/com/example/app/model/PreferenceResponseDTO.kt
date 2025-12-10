@@ -3,5 +3,7 @@ package com.example.app.model
 import com.google.gson.annotations.SerializedName
 
 data class PreferenceResponseDTO(
-    @SerializedName("initPoint") val initPoint: String
+    val id: String,
+    val init_point: String?,
+    val sandbox_init_point: String?
 )
