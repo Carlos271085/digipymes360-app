@@ -156,6 +156,7 @@ fun CarroDeComprasScreen(
                     onClick = {
                         if (carrito.isNotEmpty()) {
                             navController.navigate("pago/$total")
+
                         } else {
                             Toast.makeText(context, "El carrito está vacío", Toast.LENGTH_SHORT).show()
                         }
@@ -171,32 +172,6 @@ fun CarroDeComprasScreen(
                 // -------------------------
                 // COMPRAR SIN PASARELA (LÓGICA ANTIGUA)
                 // -------------------------
-                Button(
-                    onClick = {
-                        val comprado = viewModel.comprarCarrito()
-                        if (comprado) {
-                            Toast.makeText(
-                                context,
-                                "¡Compra realizada con éxito!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                            navController.navigate("compra_exitosa") {
-                                popUpTo("carro_compras") { inclusive = true }
-                            }
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "El carrito está vacío",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = OrangePrimary),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Comprar ahora", color = Color.White)
-                }
 
                 Spacer(Modifier.height(16.dp))
 

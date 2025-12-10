@@ -24,7 +24,6 @@ fun PagoScreen(
     viewModel: PagoViewModel = hiltViewModel()
 ) {
 
-    // Pedimos un initial explícito para que collectAsState conozca el tipo
     val uiState = viewModel.uiState.collectAsState(initial = viewModel.uiState.value).value
     var descripcion by remember { mutableStateOf("Compra en DigiPyme360") }
 
@@ -44,9 +43,9 @@ fun PagoScreen(
             verticalArrangement = Arrangement.Top
         ) {
 
-            // ==================================================
-            // SI TENEMOS URL DE WEBPAY → MOSTRAR EL WEBVIEW
-            // ==================================================
+            // ============================
+            // SI TENEMOS URL → WEBVIEW
+            // ============================
             if (!uiState.urlWebPay.isNullOrBlank()) {
 
                 Text(
@@ -60,15 +59,15 @@ fun PagoScreen(
                     modifier = Modifier.fillMaxSize(),
                     factory = { context ->
                         WebView(context).apply {
+
                             settings.javaScriptEnabled = true
                             settings.domStorageEnabled = true
 
                             webViewClient = object : WebViewClient() {
-
                                 override fun onPageFinished(view: WebView?, url: String?) {
                                     super.onPageFinished(view, url)
 
-                                    // Si la URL contiene "success", navegar a pantalla de éxito
+                                    // Detecta la URL de éxito
                                     if (url?.contains("success") == true) {
                                         navController.navigate("compra_exitosa") {
                                             popUpTo("carro_compras") { inclusive = true }
@@ -77,19 +76,17 @@ fun PagoScreen(
                                 }
                             }
 
-                            // Cargamos la URL de WebPay que vino desde el backend
                             loadUrl(uiState.urlWebPay!!)
                         }
                     }
                 )
 
-                // Salimos del Column (mostramos solo el WebView)
                 return@Column
             }
 
-            // ==================================================
-            // MONTO TOTAL
-            // ==================================================
+            // ============================
+            // MONTO
+            // ============================
             Text(
                 text = "Total a pagar:",
                 style = MaterialTheme.typography.titleMedium
@@ -101,9 +98,6 @@ fun PagoScreen(
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            // ==================================================
-            // DESCRIPCIÓN
-            // ==================================================
             OutlinedTextField(
                 value = descripcion,
                 onValueChange = { descripcion = it },
@@ -113,9 +107,6 @@ fun PagoScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ==================================================
-            // LOADING
-            // ==================================================
             if (uiState.isLoading) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -129,9 +120,6 @@ fun PagoScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ==================================================
-            // BOTÓN CONFIRMAR PAGO
-            // ==================================================
             Button(
                 onClick = {
                     viewModel.pagar(
@@ -148,9 +136,6 @@ fun PagoScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ==================================================
-            // MENSAJE RESULTADO
-            // ==================================================
             uiState.mensaje?.let { mensaje ->
                 Text(
                     text = mensaje,

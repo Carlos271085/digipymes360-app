@@ -14,6 +14,7 @@ import com.example.app.viewmodel.CarritoViewModel
 import com.example.app.viewmodel.ProductoViewModel
 import com.google.gson.Gson
 import com.example.app.model.UsuarioDTO
+import com.example.app.ui.pago.PagoScreen
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
@@ -111,6 +112,8 @@ fun AppNavGraph(navController: NavHostController) {
         // =======================================================
         //  PASARELA DE PAGO — RUTA NUEVA
         // =======================================================
+
+        ///*
         composable(
             route = "pago/{monto}",
             arguments = listOf(
@@ -128,6 +131,8 @@ fun AppNavGraph(navController: NavHostController) {
                 monto = monto
             )
         }
+
+         //*/
     }
 }
 

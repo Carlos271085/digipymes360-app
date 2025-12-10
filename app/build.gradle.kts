@@ -1,9 +1,22 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
     kotlin("kapt")
 }
+
+
+
+val localProps = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
+}
+
+val mpPublicKey: String = localProps.getProperty("MP_PUBLIC_KEY") ?: ""
 
 android {
     namespace = "com.example.app"
@@ -22,9 +35,19 @@ android {
         versionCode = 1
         versionName = "1.0"
         multiDexEnabled = true
+
+        // ───────────────────────────────
+        //  BuildConfig - PUBLIC KEY
+        // ───────────────────────────────
+        buildConfigField(
+            "String",
+            "MP_PUBLIC_KEY",
+            "\"$mpPublicKey\""
+        )
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 
@@ -44,7 +67,7 @@ android {
 
 dependencies {
 
-    // BOM: controla versiones automáticamente
+    // BOM Compose
     implementation(platform("androidx.compose:compose-bom:2024.10.01"))
 
     implementation("androidx.activity:activity-compose:1.9.3")
@@ -75,31 +98,18 @@ dependencies {
     // Icons
     implementation("androidx.compose.material:material-icons-extended")
 
-    //IMPORTAR MATERIAL DESIGN
+    // Material 3
     implementation("androidx.compose.material3:material3")
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
-        // Hilt
+    // Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-compiler:2.51.1")
 
-// Compose + Hilt
-implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    //Mercado pago
+    // Compose + Hilt Navigation
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-        // ... other dependencies
-
-        // Mercado Pago SDK
-        //val mpBom = platform(libs.mercadopago.sdk.bom)
-        //implementation(mpBom)
-        //implementation(libs.mercadopago.sdk.coreMethods) // Or other modules you need
-        //implementation(libs.mercadopago.px.checkout)
-
+    // Mercado Pago
     implementation(platform("com.mercadopago.android.sdk:sdk-android-bom:0.1.3"))
-
-    // 2. Add the specific Mercado Pago modules you need without specifying a version
-    // The BOM will manage the versions for you
     implementation("com.mercadopago.android.sdk:core-methods")
-
-
 }
