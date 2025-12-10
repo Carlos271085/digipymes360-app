@@ -7,7 +7,6 @@ data class Producto(
     var stock: Int,
     val nombre: String,
     val precio: String,
-    val imagen: Int,
     val descripcion: String
 
 )
