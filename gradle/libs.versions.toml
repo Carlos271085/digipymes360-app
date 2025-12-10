@@ -2,6 +2,13 @@
 androidGradlePlugin = "8.2.0"  # Use a recent version
 kotlin = "1.9.22"              # Use a recent version
 hilt = "2.50"                  # Use a recent version
+mercadoPagoSdkBomVersion = "LATEST_BOM_VERSION" # Replace with a specific version, e.g., "1.0.0"
+
+[libraries]
+mercadopago-sdk-bom = { group = "com.mercadopago.android.sdk", name = "sdk-android-bom", version.ref = "mercadoPagoSdkBomVersion" }
+mercadopago-sdk-coreMethods = { group = "com.mercadopago.android.sdk", name = "core-methods" }
+mercadopago-px-checkout = { group = "com.mercadopago.android.px", name = "checkout", version = "LATEST_CHECKOUT_VERSION" } # e.g., "4.+" or a specific version
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

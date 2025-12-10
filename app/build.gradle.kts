@@ -17,10 +17,11 @@ android {
 
     defaultConfig {
         applicationId = "com.example.app"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        multiDexEnabled = true
     }
 
     buildFeatures {
@@ -84,4 +85,21 @@ dependencies {
 
 // Compose + Hilt
 implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    //Mercado pago
+
+        // ... other dependencies
+
+        // Mercado Pago SDK
+        //val mpBom = platform(libs.mercadopago.sdk.bom)
+        //implementation(mpBom)
+        //implementation(libs.mercadopago.sdk.coreMethods) // Or other modules you need
+        //implementation(libs.mercadopago.px.checkout)
+
+    implementation(platform("com.mercadopago.android.sdk:sdk-android-bom:0.1.3"))
+
+    // 2. Add the specific Mercado Pago modules you need without specifying a version
+    // The BOM will manage the versions for you
+    implementation("com.mercadopago.android.sdk:core-methods")
+
+
 }

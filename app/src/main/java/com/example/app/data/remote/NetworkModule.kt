@@ -10,12 +10,15 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 import java.util.concurrent.TimeUnit
+import com.example.app.data.remote.ApiService
+//import com.example.app.data.remote.PagoApi
+
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "http://75.101.154.169:8080/"
+    private const val BASE_URL = "http://52.201.93.107:8080/"
 
     @Provides
     @Singleton
@@ -57,7 +60,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun providePagoApiService(retrofit: Retrofit): PagoApiService {
-        return retrofit.create(PagoApiService::class.java)
+    fun providePagoApiService(retrofit: Retrofit): PagoApi{
+        return retrofit.create(PagoApi::class.java)
     }
 }

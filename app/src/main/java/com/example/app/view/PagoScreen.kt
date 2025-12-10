@@ -1,15 +1,20 @@
 package com.example.app.view
 
+import android.annotation.SuppressLint
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.app.viewmodel.PagoViewModel
 
+@SuppressLint("SetJavaScriptEnabled")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PagoScreen(
@@ -18,14 +23,15 @@ fun PagoScreen(
     monto: Double,
     viewModel: PagoViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
 
+    // Pedimos un initial explícito para que collectAsState conozca el tipo
+    val uiState = viewModel.uiState.collectAsState(initial = viewModel.uiState.value).value
     var descripcion by remember { mutableStateOf("Compra en DigiPyme360") }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Confirmar Pago") }
+                title = { Text(text = "Confirmar Pago") }
             )
         }
     ) { padding ->
@@ -38,9 +44,52 @@ fun PagoScreen(
             verticalArrangement = Arrangement.Top
         ) {
 
-            // -------------------------
-            // MONTO TOTAL (NO EDITABLE)
-            // -------------------------
+            // ==================================================
+            // SI TENEMOS URL DE WEBPAY → MOSTRAR EL WEBVIEW
+            // ==================================================
+            if (!uiState.urlWebPay.isNullOrBlank()) {
+
+                Text(
+                    text = "Procesando tu pago...",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AndroidView(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = { context ->
+                        WebView(context).apply {
+                            settings.javaScriptEnabled = true
+                            settings.domStorageEnabled = true
+
+                            webViewClient = object : WebViewClient() {
+
+                                override fun onPageFinished(view: WebView?, url: String?) {
+                                    super.onPageFinished(view, url)
+
+                                    // Si la URL contiene "success", navegar a pantalla de éxito
+                                    if (url?.contains("success") == true) {
+                                        navController.navigate("compra_exitosa") {
+                                            popUpTo("carro_compras") { inclusive = true }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Cargamos la URL de WebPay que vino desde el backend
+                            loadUrl(uiState.urlWebPay!!)
+                        }
+                    }
+                )
+
+                // Salimos del Column (mostramos solo el WebView)
+                return@Column
+            }
+
+            // ==================================================
+            // MONTO TOTAL
+            // ==================================================
             Text(
                 text = "Total a pagar:",
                 style = MaterialTheme.typography.titleMedium
@@ -52,21 +101,21 @@ fun PagoScreen(
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            // -------------------------
-            // DESCRIPCIÓN DEL PAGO
-            // -------------------------
+            // ==================================================
+            // DESCRIPCIÓN
+            // ==================================================
             OutlinedTextField(
                 value = descripcion,
                 onValueChange = { descripcion = it },
-                label = { Text("Descripción") },
+                label = { Text(text = "Descripción") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // -------------------------
-            // PROCESANDO...
-            // -------------------------
+            // ==================================================
+            // LOADING
+            // ==================================================
             if (uiState.isLoading) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -74,15 +123,15 @@ fun PagoScreen(
                 ) {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(10.dp))
-                    Text("Procesando pago…")
+                    Text(text = "Creando preferencia…")
                 }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // -------------------------
+            // ==================================================
             // BOTÓN CONFIRMAR PAGO
-            // -------------------------
+            // ==================================================
             Button(
                 onClick = {
                     viewModel.pagar(
@@ -94,14 +143,14 @@ fun PagoScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isLoading
             ) {
-                Text("Confirmar Pago")
+                Text(text = "Confirmar Pago")
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // -------------------------
-            // MENSAJE DE RESULTADO
-            // -------------------------
+            // ==================================================
+            // MENSAJE RESULTADO
+            // ==================================================
             uiState.mensaje?.let { mensaje ->
                 Text(
                     text = mensaje,
@@ -111,28 +160,6 @@ fun PagoScreen(
                         MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyLarge
                 )
-            }
-
-            // -------------------------
-            // CÓDIGO DE TRANSACCIÓN
-            // -------------------------
-            uiState.codigoTransaccion?.let { codigo ->
-                Text(
-                    text = "Código de transacción: $codigo",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            // -------------------------
-            // NAVEGAR CUANDO EL PAGO ES EXITOSO
-            // -------------------------
-            if (uiState.exito == true) {
-                LaunchedEffect(Unit) {
-                    navController.navigate("compra_exitosa") {
-                        popUpTo("carro_compras") { inclusive = true }
-                    }
-                }
             }
         }
     }

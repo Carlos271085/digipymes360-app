@@ -7,9 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object NetworkModule_Cliente {
-    //private const val BASE_URL = "http://98.90.175.159:8082/"//Carlos
-    private const val BASE_URL = "http://35.173.75.94:8082/"//Eduardo
-    //private const val BASE_URL = "http://98.95.22.3:8082/"//Karina
+    private const val BASE_URL = "http://98.94.153.135:8082/"//Eduardo
+
 
 
     private val logging = HttpLoggingInterceptor().apply {
