@@ -29,7 +29,8 @@ import com.example.app.ui.theme.*
 import com.example.app.viewmodel.CarritoViewModel
 import com.example.app.viewmodel.ProductoViewModel
 import kotlinx.coroutines.launch
-
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -167,7 +168,11 @@ fun HomeScreen(
                             .height(200.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = OrangePrimary)
+                        CircularProgressIndicator(
+                            color = OrangePrimary,
+                            modifier = Modifier.semantics { contentDescription = "Loading" }
+                        )
+
                     }
                 }
 

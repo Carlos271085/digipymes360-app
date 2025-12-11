@@ -32,19 +32,21 @@ class PagoViewModel @Inject constructor(
         when {
             url.contains("success", ignoreCase = true) -> {
                 _uiState.value = _uiState.value.copy(
-                    pagoCompletado = true
+                    exito = true,
+                    mensaje = "Pago completado"
                 )
             }
 
             url.contains("failure", ignoreCase = true) -> {
                 _uiState.value = _uiState.value.copy(
-                    pagoFallido = true
+                    exito = false,
+                    mensaje = "Pago fallido"
                 )
             }
 
             url.contains("pending", ignoreCase = true) -> {
                 _uiState.value = _uiState.value.copy(
-                    pagoPendiente = true
+                    mensaje = "Pago pendiente"
                 )
             }
         }

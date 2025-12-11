@@ -52,9 +52,6 @@ fun CarroDeComprasScreen(
             verticalArrangement = Arrangement.Top
         ) {
 
-            // -------------------------
-            // CARRITO VACÍO
-            // -------------------------
             if (carrito.isEmpty()) {
                 Text(
                     text = "Tu carrito está vacío",
@@ -67,9 +64,6 @@ fun CarroDeComprasScreen(
                 )
             } else {
 
-                // -------------------------
-                // LISTA DE PRODUCTOS
-                // -------------------------
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.weight(1f)
@@ -135,9 +129,6 @@ fun CarroDeComprasScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                // -------------------------
-                // TOTAL DE COMPRA
-                // -------------------------
                 val total = viewModel.totalCompra()
 
                 Text(
@@ -149,9 +140,6 @@ fun CarroDeComprasScreen(
 
                 val context = LocalContext.current
 
-                // -------------------------
-                // PROCEDER AL PAGO (NUEVO)
-                // -------------------------
                 Button(
                     onClick = {
                         if (carrito.isNotEmpty()) {
@@ -169,15 +157,8 @@ fun CarroDeComprasScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                // -------------------------
-                // COMPRAR SIN PASARELA (LÓGICA ANTIGUA)
-                // -------------------------
-
                 Spacer(Modifier.height(16.dp))
 
-                // -------------------------
-                // VACIAR CARRITO
-                // -------------------------
                 Button(
                     onClick = { viewModel.vaciarCarrito() },
                     colors = ButtonDefaults.buttonColors(containerColor = RedError),
@@ -188,9 +169,6 @@ fun CarroDeComprasScreen(
 
                 Spacer(Modifier.height(8.dp))
 
-                // -------------------------
-                // VOLVER AL HOME
-                // -------------------------
                 OutlinedButton(
                     onClick = { navController.navigate("home") },
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = BlueDark),
